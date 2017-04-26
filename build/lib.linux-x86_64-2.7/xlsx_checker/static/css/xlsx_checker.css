@@ -1,9 +1,0 @@
-/* CSS for XlsxCheckerXBlock */
-
-.xlsx_checker_block .count {
-    font-weight: bold;
-}
-
-.xlsx_checker_block p {
-    cursor: pointer;
-}

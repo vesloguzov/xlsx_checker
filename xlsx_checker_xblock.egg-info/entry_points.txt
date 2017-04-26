@@ -1,3 +1,0 @@
-[xblock.v1]
-xlsx_checker = xlsx_checker:XlsxCheckerXBlock
-
