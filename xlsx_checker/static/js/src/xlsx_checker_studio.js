@@ -5,8 +5,6 @@ function XlsxCheckerXBlock(runtime, element) {
         $('.count', element).text(result.count);
     }
 
-    var handlerUrl = runtime.handlerUrl(element, 'increment_count');
-
 
   var tabList = "<li class=\"action-tabs is-active-tabs\" id=\"main-settings-tab\">Файлы</li><li class=\"action-tabs\" id=\"scenario-settings-tab\">Основные</li><li class=\"action-tabs\" id=\"advanced-settings-tab\">Расширенные</li>";
   document.getElementsByClassName("editor-modes action-list action-modes")[0].innerHTML = tabList;
@@ -40,7 +38,7 @@ function XlsxCheckerXBlock(runtime, element) {
   };
 
   $( function() {
-    $("#tabs", element).tabs();
+    $("#lab-tabs", element).tabs();
   } );
 
     $(element).find(".save-button").bind("click", function() {
@@ -51,6 +49,7 @@ function XlsxCheckerXBlock(runtime, element) {
                 "question": $(element).find("textarea[name=question]").val(),
                 "weight": $(element).find("input[name=weight]").val(),
                 "max_attempts": $(element).find("input[name=max_attempts]").val(),
+                "lab_scenario": $(element).find("select[name=lab_scenario]").val(),
             };
 
         $.post(handlerUrl, JSON.stringify(data)).done(function (response) {

@@ -14,17 +14,18 @@
             <div id="question">{{question|safe}}</div>
         {% endif %}
 
+        <a class="download_instruction" href="{{instruction_link}}">Скачать инструкцию</a>
+
     {% if student_xlsx_name != '' %}
         <p>Загруженный файл</p>
         <a class="download_student_file">{{student_xlsx_name}}<a/>
     {% endif %}
 
     <div class="upload-block">
-    		<form enctype="multipart/form-data" class="student">
-    			<h2>Загрузить документ</h2>
-    			<input type="file" class="student-file" name="studentFile" accept=".xlsx"/>
-    			<input type="button" value="Загрузить"  class="upload-student-file"/>
-    		</form>
+            <form enctype="multipart/form-data" class="student">
+                <input type="file" class="student-file" name="studentFile" accept=".xlsx"/>
+                <input type="button" value="Загрузить"  class="upload-student-file"/>
+            </form>
     </div>
 
     <div class="action">

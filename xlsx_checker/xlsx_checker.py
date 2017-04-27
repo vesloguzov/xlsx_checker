@@ -8,7 +8,13 @@ import logging
 import mimetypes
 import os
 import uuid
+import sys
 
+from openpyxl import Workbook, load_workbook
+from openpyxl.chart import ScatterChart, Series, Reference
+from openpyxl.chart.reader import reader
+from openpyxl.chart.layout import Layout, ManualLayout
+from openpyxl.styles import *
 # from docx import Document
 
 from xblock.core import XBlock
@@ -34,6 +40,21 @@ from .utils import (
     load_resources,
     )
 
+from lab_1_create_template import lab_1_create_template
+from lab_1_check_answer import lab_1_check_answer
+
+from lab_2_create_template import lab_2_create_template
+from lab_2_check_answer import lab_2_check_answer
+
+from lab_3_create_template import lab_3_create_template
+from lab_3_check_answer import lab_3_check_answer
+
+log = logging.getLogger(__name__)
+BLOCK_SIZE = 8 * 1024
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 class XlsxCheckerXBlock(XBlock):
     """
     TO-DO: document what your XBlock does.
@@ -46,21 +67,39 @@ class XlsxCheckerXBlock(XBlock):
         scope=Scope.settings
     )
 
-    lines_settings = JSONField(
+    scenarios_settings = JSONField(
         display_name=u"Настройки сценария",
         help=u"Настройки сценария",
         default={
-            "lab1": {"instruction_name": "instruction_lab_1.docx", "number": 1, "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel"},
-            "lab2": {"instruction_name": "instruction_lab_2.docx", "number": 2, "name": "Построение графиков функций"},
-            "lab3": {"instruction_name": "instruction_lab_3.docx", "number": 3, "name": "Сортировка, фильтры и промежуточные итоги"},
+            "0": {
+                  "instruction_name": "instruction_lab_0.docx", 
+                  "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel",
+                  "employees": ["Иванов И.М.", "Коробова П.Н", "Морозов И.Р.", "Петров Г.Т.", "Ромашова П.Т.", "Смирнов С.И.", "Соколова О.С."] 
+                 },
+            "1": {
+                  "instruction_name": "instruction_lab_1.docx", 
+                  "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel",
+                  "employees": ["Иванов И.М.", "Коробова П.Н", "Морозов И.Р.", "Петров Г.Т.", "Ромашова П.Т.", "Смирнов С.И.", "Соколова О.С."] 
+                 },
+            "2": {
+                  "instruction_name": "instruction_lab_2.docx", 
+                  "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel",
+                  "employees": ["Иванов И.М.", "Коробова П.Н", "Морозов И.Р.", "Петров Г.Т.", "Ромашова П.Т.", "Смирнов С.И.", "Соколова О.С."] 
+                 },
         },
         scope=Scope.settings
     )
+
+    instruction_link = String(
+         default='', scope=Scope.settings,
+         help='Link for instruction download',
+        )
 
     correct_xlsx_uid = String(
          default='', scope=Scope.settings,
          help='Correct file from teacher',
         )
+
     correct_xlsx_name = String(
          default='', scope=Scope.settings,
          help='Name of correct file from teacher',
@@ -133,6 +172,7 @@ class XlsxCheckerXBlock(XBlock):
             "student_xlsx_name": self.student_xlsx_name,
             "points": self.points,
             "attempts": self.attempts,
+            "instruction_link": self.runtime.local_resource_url(self, 'public/instructions/' + self.instruction_link),
         }
 
         if self.max_attempts != 0:
@@ -153,7 +193,7 @@ class XlsxCheckerXBlock(XBlock):
         )
 
         js_urls = (
-            "static/js/src/dxlsx_checker.js",
+            "static/js/src/xlsx_checker.js",
             )
 
         css_urls = (
@@ -171,6 +211,7 @@ class XlsxCheckerXBlock(XBlock):
             "weight": self.weight,
             "question": self.question,
             "max_attempts": self.max_attempts,
+            "lab_scenario": self.lab_scenario,
         }
 
         fragment = Fragment()
@@ -194,18 +235,6 @@ class XlsxCheckerXBlock(XBlock):
         fragment.initialize_js('XlsxCheckerXBlock')
         return fragment
 
-    # TO-DO: change this handler to perform your own actions.  You may need more
-    # than one handler, or you may not need any handlers at all.
-    @XBlock.json_handler
-    def increment_count(self, data, suffix=''):
-        """
-        An example handler, which increments the data.
-        """
-        # Just to show data coming in...
-        assert data['hello'] == 'world'
-
-        self.count += 1
-        return {"count": self.count}
 
     # TO-DO: change this to create the scenarios you'd like to see in the
     # workbench while developing your XBlock.
@@ -249,29 +278,43 @@ class XlsxCheckerXBlock(XBlock):
         self.question = data.get('question')
         self.weight = data.get('weight')
         self.max_attempts = data.get('max_attempts')
+        self.lab_scenario = data.get('lab_scenario')
+ 
+        self.instruction_link = self.scenarios_settings[str(self.lab_scenario)]["instruction_name"]
 
+        if str(self.lab_scenario) == "0":
+            pass
+        if str(self.lab_scenario) == "1":
+            pass
+        if str(self.lab_scenario) == "2":
+            pass
         return {'result': 'success'}
+
+    @XBlock.handler
+    def student_filename(self, request, suffix=''):
+        return Response(json_body={'student_filename': self.student_xlsx_name})
 
     @XBlock.handler
     def download_student_file(self, request, suffix=''):
         path = self._students_storage_path(self.student_xlsx_uid, self.student_xlsx_name)
         return self.download(
             path,
-            mimetypes.guess_type(self.source_xlsx_name)[0],
+            mimetypes.guess_type(self.student_xlsx_name)[0],
             self.student_xlsx_name
         )
 
 
-    def is_course_staff(self):
-        # pylint: disable=no-member
-        """
-         Check if user is course staff.
-        """
-        return getattr(self.xmodule_runtime, 'user_is_staff', False)
-
     @XBlock.handler
-    def student_filename(self, request, suffix=''):
-        return Response(json_body={'student_filename': self.student_xlsx_name})
+    def download_instruction(self, request, suffix=''):
+        path = self.runtime.local_resource_url(self, 'public/instructions/' + self.instruction_link)
+        return self.download(
+            path,
+            'docx',
+            self.instruction_link
+        )
+
+    def is_course_staff(self):
+        return getattr(self.xmodule_runtime, 'user_is_staff', False)
 
     @XBlock.handler
     def upload_student_file(self, request, suffix=''):
@@ -284,11 +327,8 @@ class XlsxCheckerXBlock(XBlock):
         obj = path
         return Response(json_body=obj)
 
+
     def _students_storage_path(self, uid, filename):
-        # pylint: disable=no-member
-        """
-        Get file path of storage.
-        """
         path = (
             '{loc.org}/{loc.course}/{loc.block_type}/students'
             '/{uid}{ext}'.format(
@@ -299,11 +339,13 @@ class XlsxCheckerXBlock(XBlock):
         )
         return path
 
+
     def download(self, path, mime_type, filename, require_staff=False):
         """
         Return a file from storage and return in a Response.
         """
         try:
+            print "!!!!!!!!!!!!!!!!", path
             file_descriptor = default_storage.open(path)
             app_iter = iter(partial(file_descriptor.read, BLOCK_SIZE), '')
             return Response(

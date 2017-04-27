@@ -7,6 +7,9 @@ function XlsxCheckerXBlock(runtime, element) {
    $('.download_student_file', element).attr('href', download_student_file);
    
    var student_filename = runtime.handlerUrl(element, 'student_filename');
+    
+   // var download_instruction = runtime.handlerUrl(element, 'download_instruction');
+   // $('.download_instruction', element).attr('href', download_instruction);
 
    var student_submit = runtime.handlerUrl(element,'student_submit');
 
@@ -22,6 +25,7 @@ function XlsxCheckerXBlock(runtime, element) {
     }
 
     $(':button.upload-student-file').on('click', function() {
+        console.log("KEK");
         $.ajax({
             url: upload_student_file,
             type: 'POST',
