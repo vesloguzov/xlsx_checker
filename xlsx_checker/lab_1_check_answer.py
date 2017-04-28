@@ -282,6 +282,8 @@ def check_functions(ws, ws_read_only, correct_data):
     # Проверяем сумму сумм к выдаче
     amount_granted_sum_cell = 'I12'
     response_message["functions"]["amount_granted_sum"] = {}
+
+
     if formulas_is_equal(ws[amount_granted_sum_cell].value, correct_data["amount_granted_sum"]["formula"]) and round(ws_read_only[amount_granted_sum_cell].value, 1) == round(correct_data["amount_granted_sum"]["values"], 1):
         response_message["functions"]["amount_granted_sum"]["status"] = True
         response_message["functions"]["amount_granted_sum"]["message"] = "Сумма зарплат к выдаче в рублях посчитана верно"
@@ -293,7 +295,8 @@ def check_functions(ws, ws_read_only, correct_data):
     # Проверяем сумму сумм к выдаче в долларах
     amount_granted_dollar_sum_cell = 'J12'
     response_message["functions"]["amount_granted_dollar_sum"] = {}
-    if formulas_is_equal(ws[amount_granted_dollar_sum_cell].value, correct_data["amount_granted_dollar_sum"]["formula"]) and round(ws_read_only[amount_granted_dollar_sum_cell].value, 1) == round(correct_data["amount_granted_dollar_sum"]["values"], 1):
+    
+    if formulas_is_equal(ws[amount_granted_dollar_sum_cell].value, correct_data["amount_granted_dollar_sum"]["formula"]) and int(ws_read_only[amount_granted_dollar_sum_cell].value) == int(correct_data["amount_granted_dollar_sum"]["values"]):
         response_message["functions"]["amount_granted_dollar_sum"]["status"] = True
         response_message["functions"]["amount_granted_dollar_sum"]["message"] = "Сумма зарплат к выдаче в долларах посчитана верно"
     else:
@@ -339,13 +342,23 @@ def check_ws_have_rule(ws, cells_range, operator, formula_value):
     return False
 
 
-def lab_1_check_answer(student_wb, student_wb_data_only, employees):
+def lab_1_check_answer(student_wb, student_wb_data_only):
+    # response_message = {}
+    # response_message["formulas"] = {}
+    # response_message["formats"] = {}
+    # response_message["functions"] = {}
+    # response_message["conditional_formatting"] = {}
+    # response_message["charts"] = {}
+    response_message["errors"] = []
+
     dollar_rate = 48
+    employees = ["Иванов И.М.", "Коробова П.Н", "Морозов И.Р.", "Петров Г.Т.", "Ромашова П.Т.", "Смирнов С.И.", "Соколова О.С."]
+
     student_ws = student_wb[student_wb.get_sheet_names()[0]]
     ws_read_only = student_wb_data_only[student_wb_data_only.get_sheet_names()[0]]
     correct_values_data = calculate_correct_values(student_ws, 'E5:E11', sorted(employees), dollar_rate)
     if correct_values_data:
-
+    
         # Проверяем правильность ФИО (в т.ч. сортировку)
         check_formats(student_ws)
 

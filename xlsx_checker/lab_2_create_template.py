@@ -49,8 +49,8 @@ def create_table_ws_2(ws):
     ws = set_border_and_fill(ws, 'A3:B3', fill=PatternFill("solid", fgColor="DDDDDD"))
     ws = set_border_and_fill(ws, 'A4:B34', None)
 
-    img = Image('img/lab_2_equation.png')
-    ws.add_image(img, 'C1')
+    # img = Image('img/lab_2_equation.png')
+    # ws.add_image(img, 'C1')
     ws.row_dimensions[1].height = 22.5
     ws.row_dimensions[2].height = 22.5
 

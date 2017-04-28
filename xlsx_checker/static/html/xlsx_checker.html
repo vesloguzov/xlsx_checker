@@ -14,7 +14,8 @@
             <div id="question">{{question|safe}}</div>
         {% endif %}
 
-        <a class="download_instruction" href="{{instruction_link}}">Скачать инструкцию</a>
+        <a class="download_instruction" href="{{instruction_link}}">Скачать инструкцию</a><br />
+        <a class="template_link" href="{{template_link}}">Скачать шаблон для задания</a>
 
     {% if student_xlsx_name != '' %}
         <p>Загруженный файл</p>
@@ -26,6 +27,21 @@
                 <input type="file" class="student-file" name="studentFile" accept=".xlsx"/>
                 <input type="button" value="Загрузить"  class="upload-student-file"/>
             </form>
+    </div>
+
+    <div>
+        <p>Гловальные ошибки:</p>
+        <div class="global-errors"></div>
+    </div>
+    
+    <div>
+        <p>Ошибки:</p>
+        <div class="analyze-errors"></div>
+    </div>
+
+    <div>
+        <p>Полный анализ:</p>
+        <div class="analyze-all"></div>
     </div>
 
     <div class="action">

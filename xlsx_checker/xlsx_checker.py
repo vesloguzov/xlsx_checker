@@ -95,6 +95,16 @@ class XlsxCheckerXBlock(XBlock):
          help='Link for instruction download',
         )
 
+    template_link = String(
+         default='', scope=Scope.settings,
+         help='Link for template download',
+        )
+
+    analyze = JSONField(
+         default='', scope=Scope.settings,
+         help='Analyze document',
+        )
+
     correct_xlsx_uid = String(
          default='', scope=Scope.settings,
          help='Correct file from teacher',
@@ -173,6 +183,7 @@ class XlsxCheckerXBlock(XBlock):
             "points": self.points,
             "attempts": self.attempts,
             "instruction_link": self.runtime.local_resource_url(self, 'public/instructions/' + self.instruction_link),
+            "template_link": self.runtime.local_resource_url(self, 'public/templates/' + self.template_link),
         }
 
         if self.max_attempts != 0:
@@ -260,6 +271,54 @@ class XlsxCheckerXBlock(XBlock):
         def check_answer():
             return 55
 
+        result = {}
+        student_path = self._students_storage_path(self.student_xlsx_uid, self.student_xlsx_name)
+        
+        if str(self.lab_scenario) == "0":
+            student_wb =  load_workbook(default_storage.open(student_path))
+            student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
+            result = lab_1_check_answer(student_wb, student_wb_data_only)
+            self.analyze = result
+
+        if str(self.lab_scenario) == "1":
+            # correct_wb = load_workbook('lab2_correct.xlsx')
+            # correct_wb_data_only =  load_workbook('lab2_correct.xlsx', data_only=True)
+
+            # Проверка
+            student_wb =  load_workbook(default_storage.open(student_path))
+            student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
+            result = lab_2_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only)
+            self.analyze = result
+
+        if str(self.lab_scenario) == "2":
+            data = [
+                ["Комбайн", "19.07.2017", 100, 7800.00],
+                ["Миксер", "30.05.2017", 38, 3000.00],
+                ["Микровоновка", "23.08.2017", 38, 4500.00],
+                ["Пылесос", "17.03.2017", 25, 3000.00],
+                ["Холодильник", "03.05.2016", 56, 25000.00],
+                ["Пылесос", "03.08.2017", 6, 1500.00],
+                ["Телевизор", "02.03.2014", 50, 6000.00],
+                ["Телевизор", "16.02.2016", 19, 12000.00],
+                ["Телевизор", "13.09.2017", 32, 4500.00],
+                ["Утюг", "12.07.2016", 70, 2000.00],
+                ["Утюг", "20.08.2016", 15, 1000.00],
+                ["Утюг", "02.08.2017", 20, 2900.00],
+                ["Чайник", "15.03.2017", 25, 1540.00],
+                ["Чайник", "27.07.2016", 102, 1200.00],
+                ["Чайник", "04.08.2016", 45, 500.00],
+            ]
+            pass
+            # correct_wb = load_workbook('lab3_correct.xlsx')
+            # correct_wb_data_only =  load_workbook('lab3_correct.xlsx', data_only=True)
+
+            # # Проверка
+            # student_wb =  load_workbook('lab3_student.xlsx')
+            # student_wb_data_only =  load_workbook('lab3_correct.xlsx', data_only=True)
+
+            # result = lab_3_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only, data)
+
+
         grade_global = check_answer()
         self.points = grade_global
         self.points = grade_global * self.weight / 100
@@ -269,7 +328,7 @@ class XlsxCheckerXBlock(XBlock):
             'value': self.points,
             'max_value': self.weight,
         })
-        res = {"success_status": 'ok', "points": self.points, "weight": self.weight, "attempts": self.attempts, "max_attempts": self.max_attempts}
+        res = {"success_status": 'ok', "points": self.points, "weight": self.weight, "attempts": self.attempts, "max_attempts": self.max_attempts, "analyze": result }
         return res
 
     @XBlock.json_handler
@@ -279,15 +338,46 @@ class XlsxCheckerXBlock(XBlock):
         self.weight = data.get('weight')
         self.max_attempts = data.get('max_attempts')
         self.lab_scenario = data.get('lab_scenario')
- 
+
         self.instruction_link = self.scenarios_settings[str(self.lab_scenario)]["instruction_name"]
 
         if str(self.lab_scenario) == "0":
-            pass
+            template_wb = Workbook()
+            template_ws = template_wb.active
+            template_ws = lab_1_create_template(template_ws)
+            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/lab0_template.xlsx')
+            self.template_link = 'lab0_template.xlsx'
+
         if str(self.lab_scenario) == "1":
-            pass
+            template_wb = Workbook()
+            template_wb = lab_2_create_template(template_wb)
+            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/lab1_template.xlsx')
+            self.template_link = 'lab1_template.xlsx'
+
         if str(self.lab_scenario) == "2":
-            pass
+            data = [
+                    ["Комбайн", "19.07.2017", 100, 7800.00],
+                    ["Миксер", "30.05.2017", 38, 3000.00],
+                    ["Микровоновка", "23.08.2017", 38, 4500.00],
+                    ["Пылесос", "17.03.2017", 25, 3000.00],
+                    ["Холодильник", "03.05.2016", 56, 25000.00],
+                    ["Пылесос", "03.08.2017", 6, 1500.00],
+                    ["Телевизор", "02.03.2014", 50, 6000.00],
+                    ["Телевизор", "16.02.2016", 19, 12000.00],
+                    ["Телевизор", "13.09.2017", 32, 4500.00],
+                    ["Утюг", "12.07.2016", 70, 2000.00],
+                    ["Утюг", "20.08.2016", 15, 1000.00],
+                    ["Утюг", "02.08.2017", 20, 2900.00],
+                    ["Чайник", "15.03.2017", 25, 1540.00],
+                    ["Чайник", "27.07.2016", 102, 1200.00],
+                    ["Чайник", "04.08.2016", 45, 500.00],
+                   ]
+            template_wb = Workbook()
+            template_ws = template_wb.active
+            template_ws = lab_3_create_template(template_ws, data)
+            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/lab2_template.xlsx')
+            self.template_link = 'lab2_template.xlsx'
+
         return {'result': 'success'}
 
     @XBlock.handler
@@ -326,7 +416,22 @@ class XlsxCheckerXBlock(XBlock):
             default_storage.save(path, File(upload.file))
         obj = path
         return Response(json_body=obj)
+    
 
+    def _file_storage_path(self, uid, filename):
+        # pylint: disable=no-member
+        """
+        Get file path of storage.
+        """
+        path = (
+            '{loc.org}/{loc.course}/{loc.block_type}/templates'
+            '/{uid}{ext}'.format(
+                loc=self.location,
+                uid= uid,
+                ext=os.path.splitext(filename)[1]
+            )
+        )
+        return path
 
     def _students_storage_path(self, uid, filename):
         path = (
@@ -345,7 +450,6 @@ class XlsxCheckerXBlock(XBlock):
         Return a file from storage and return in a Response.
         """
         try:
-            print "!!!!!!!!!!!!!!!!", path
             file_descriptor = default_storage.open(path)
             app_iter = iter(partial(file_descriptor.read, BLOCK_SIZE), '')
             return Response(

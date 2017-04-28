@@ -33,14 +33,15 @@ def set_table_header(ws):
     ws = set_border_and_fill(ws, 'A4:I4', fill=PatternFill("solid", fgColor="DDDDDD"))
     for i in range(1, 10):
         ws.cell(row=4, column=i).value = headers_names[i-1]
-
     return ws
 
-def lab_1_create_template(ws, employees, positions):
+def lab_1_create_template(ws):
     ws = set_table_header(ws)
     dollar_rate = 48
-    shuffle_employees = list(employees)
-    random.shuffle(shuffle_employees)
+    # shuffle_employees = list(employees)
+    # random.shuffle(shuffle_employees)
+    
+    employees = ["Иванов И.М.", "Коробова П.Н", "Морозов И.Р.", "Петров Г.Т.", "Ромашова П.Т.", "Смирнов С.И.", "Соколова О.С."]
 
     positions = ["Директор", "Менеджер", "Бухгалтер", "Зам. директора", "Секетарь", "Водитель", "Строитель", "Секетарь", "Водитель", "Строитель"]
 
@@ -65,7 +66,7 @@ def lab_1_create_template(ws, employees, positions):
             if j==1:
                 ws.cell(row=pos_i, column=j).value = i
             if j == 2:
-                ws.cell(row=pos_i, column=j).value = shuffle_employees[i-1]
+                ws.cell(row=pos_i, column=j).value = employees[i-1]
             if j == 3:
                 ws.cell(row=pos_i, column=j).value = positions[i-1]
             if j == 4:
