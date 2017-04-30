@@ -9,6 +9,8 @@ import mimetypes
 import os
 import uuid
 import sys
+import json
+import random
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.chart import ScatterChart, Series, Reference
@@ -63,7 +65,7 @@ class XlsxCheckerXBlock(XBlock):
         display_name=u"Номер сценария",
         help=(u"Номер сценария",
               u"Номер сценария"),
-        default=0,
+        default=9999,
         scope=Scope.settings
     )
 
@@ -100,9 +102,15 @@ class XlsxCheckerXBlock(XBlock):
          help='Link for template download',
         )
 
-    analyze = JSONField(
-         default='', scope=Scope.settings,
+    xlsx_analyze = JSONField(
+         default={}, 
+         scope=Scope.user_state,
          help='Analyze document',
+        )
+
+    correct_link = String(
+         default='', scope=Scope.settings,
+         help='Link for correct file',
         )
 
     correct_xlsx_uid = String(
@@ -184,6 +192,8 @@ class XlsxCheckerXBlock(XBlock):
             "attempts": self.attempts,
             "instruction_link": self.runtime.local_resource_url(self, 'public/instructions/' + self.instruction_link),
             "template_link": self.runtime.local_resource_url(self, 'public/templates/' + self.template_link),
+            "lab_scenario": self.lab_scenario,
+            "xlsx_analyze": self.xlsx_analyze,
         }
 
         if self.max_attempts != 0:
@@ -213,7 +223,7 @@ class XlsxCheckerXBlock(XBlock):
 
         load_resources(js_urls, css_urls, fragment)
 
-        fragment.initialize_js('XlsxCheckerXBlock')
+        fragment.initialize_js('XlsxCheckerXBlock', {'xlsx_analyze': self.xlsx_analyze, 'lab_scenario': self.lab_scenario})
         return fragment
 
     def studio_view(self, context=None):
@@ -269,7 +279,7 @@ class XlsxCheckerXBlock(XBlock):
     def student_submit(self, data, suffix=''):
 
         def check_answer():
-            return 55
+            return random.randint(10, 100)
 
         result = {}
         student_path = self._students_storage_path(self.student_xlsx_uid, self.student_xlsx_name)
@@ -278,17 +288,16 @@ class XlsxCheckerXBlock(XBlock):
             student_wb =  load_workbook(default_storage.open(student_path))
             student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
             result = lab_1_check_answer(student_wb, student_wb_data_only)
-            self.analyze = result
+            self.xlsx_analyze = result
 
         if str(self.lab_scenario) == "1":
-            # correct_wb = load_workbook('lab2_correct.xlsx')
-            # correct_wb_data_only =  load_workbook('lab2_correct.xlsx', data_only=True)
+            correct_wb = load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab1_correct.xlsx')
+            correct_wb_data_only =  load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab1_correct.xlsx', data_only=True)
 
-            # Проверка
             student_wb =  load_workbook(default_storage.open(student_path))
             student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
             result = lab_2_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only)
-            self.analyze = result
+            self.xlsx_analyze = result
 
         if str(self.lab_scenario) == "2":
             data = [
@@ -328,7 +337,7 @@ class XlsxCheckerXBlock(XBlock):
             'value': self.points,
             'max_value': self.weight,
         })
-        res = {"success_status": 'ok', "points": self.points, "weight": self.weight, "attempts": self.attempts, "max_attempts": self.max_attempts, "analyze": result }
+        res = {"success_status": 'ok', "points": self.points, "weight": self.weight, "attempts": self.attempts, "max_attempts": self.max_attempts, "xlsx_analyze": self.xlsx_analyze }
         return res
 
     @XBlock.json_handler
@@ -353,6 +362,7 @@ class XlsxCheckerXBlock(XBlock):
             template_wb = lab_2_create_template(template_wb)
             template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/lab1_template.xlsx')
             self.template_link = 'lab1_template.xlsx'
+            self.correct_link = self.runtime.local_resource_url(self, 'corrects/lab1_correct.xlsx')
 
         if str(self.lab_scenario) == "2":
             data = [
@@ -377,6 +387,7 @@ class XlsxCheckerXBlock(XBlock):
             template_ws = lab_3_create_template(template_ws, data)
             template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/lab2_template.xlsx')
             self.template_link = 'lab2_template.xlsx'
+            self.correct_link = self.runtime.local_resource_url(self, 'corrects/lab2_correct.xlsx')
 
         return {'result': 'success'}
 

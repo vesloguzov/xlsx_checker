@@ -1,11 +1,16 @@
 /* Javascript for XlsxCheckerXBlock. */
-function XlsxCheckerXBlock(runtime, element) {
+function XlsxCheckerXBlock(runtime, element, data) {
 
+   var xlsx_analyze = data["xlsx_analyze"];  
+   var lab_scenario = data["lab_scenario"];
+   if(xlsx_analyze != {}){
+   	showLab1Analyze(xlsx_analyze);
+   }
+   
    var upload_student_file = runtime.handlerUrl(element, 'upload_student_file');
 
    var download_student_file = runtime.handlerUrl(element, 'download_student_file');
    $('.download_student_file', element).attr('href', download_student_file);
-   
    var student_filename = runtime.handlerUrl(element, 'student_filename');
     
    // var download_instruction = runtime.handlerUrl(element, 'download_instruction');
@@ -48,13 +53,11 @@ function XlsxCheckerXBlock(runtime, element) {
         });
     });
 
-    function successCheck(result) {
-        $('.analyze-all', element).empty()
+    function showLab1Analyze(analyze_object){
+    	$('.analyze-all', element).empty()
         $('.analyze-errors', element).empty()
         $('.global-errors', element).empty()
-        analyze = {}
-        analyze = result["analyze"];
-        console.log(analyze);
+        analyze = analyze_object
         if(analyze["errors"].length > 0){
                 var errors = document.createElement("div");
                 analyze["errors"].forEach(function(item, i, arr) {
@@ -129,6 +132,11 @@ function XlsxCheckerXBlock(runtime, element) {
                 $('.analyze-all', element).append(criterion_all);
             });
         }
+    }
+
+    function successCheck(result) {
+        updatePointsAttempts(result)
+        showLab1Analyze(result["xlsx_analyze"]);
 
     }
 
@@ -142,6 +150,17 @@ function XlsxCheckerXBlock(runtime, element) {
         });
 
     });
+
+    function updatePointsAttempts(result) {
+        $('.attempts', element).text(result.attempts);
+        $(element).find('.weight').html('Набрано баллов: <me-span class="points"></span>');
+        $('.points', element).text(result.points + ' из ' + result.weight);
+
+        if (result.max_attempts && result.max_attempts <= result.attempts) {
+            $('.Check', element).remove();
+            $('.Save', element).remove();
+        };
+    };
 
     $(function ($) {
         /* Here's where you'd do things on page load. */

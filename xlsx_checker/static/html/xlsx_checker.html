@@ -1,5 +1,7 @@
 <div class="problem">
 
+
+
 <div class="problem-progress">
         {% if points == 0 or points %}
             <me-span class="weight"> Набрано баллов: <me-span class="points">{{points}} из {{weight}}</me-span></me-span>
@@ -10,7 +12,11 @@
 
 
         <h2 class="problem-header">{{display_name}}</h2>
+
+ {% if lab_scenario != 9999 %}
+
         {% if question != '' and question != "None" %}
+
             <div id="question">{{question|safe}}</div>
         {% endif %}
 
@@ -30,7 +36,7 @@
     </div>
 
     <div>
-        <p>Гловальные ошибки:</p>
+        <p>Глобальные ошибки:</p>
         <div class="global-errors"></div>
     </div>
     
@@ -63,5 +69,9 @@
             {% endif %}
 
     </div>
+
+        {% else %}
+            <p>Задание еще не настроено!</p>
+        {% endif %}
 
 </div> 
