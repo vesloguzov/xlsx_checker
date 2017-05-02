@@ -7,3 +7,40 @@
 .xlsx_checker_block p {
     cursor: pointer;
 }
+
+.file-upload-block{
+	background: #ececec !important;
+    margin: 30px 0px;
+    padding: 10px;
+}
+
+.file-upload-block input[type="button"]{
+    font-weight: 400 !important;
+    padding: 0px 6px !important;
+    margin: 10px;
+}
+
+.file-upload-block form{
+	padding: 10px !important;
+    display: inline-grid !important;
+}
+.upload-block{
+	text-align: center;
+}
+
+.file-upload-block form p{
+   text-align: center !important;
+    margin-bottom: 0.4em !important;
+}
+
+.current-student-file p{
+	font-size: 1.2em !important;
+    font-weight: normal !important;
+    margin-bottom: 0.4em !important;
+}
+
+.block-analyze{
+	padding: 10px;
+    background: #ececec;
+    margin: 30px 0px;
+}

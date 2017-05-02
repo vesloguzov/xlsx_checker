@@ -73,20 +73,23 @@ class XlsxCheckerXBlock(XBlock):
         display_name=u"Настройки сценария",
         help=u"Настройки сценария",
         default={
-            "0": {
-                  "instruction_name": "instruction_lab_0.docx", 
-                  "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel",
-                  "employees": ["Иванов И.М.", "Коробова П.Н", "Морозов И.Р.", "Петров Г.Т.", "Ромашова П.Т.", "Смирнов С.И.", "Соколова О.С."] 
-                 },
             "1": {
-                  "instruction_name": "instruction_lab_1.docx", 
-                  "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel",
-                  "employees": ["Иванов И.М.", "Коробова П.Н", "Морозов И.Р.", "Петров Г.Т.", "Ромашова П.Т.", "Смирнов С.И.", "Соколова О.С."] 
+                  "instruction_name": "Лабораторная 1. Указания к работе.docx", 
+                  "template_name": "lab1_template.xlsx",
+                  "correct_name": "lab1_correct.xlsx",
+                  "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel"
                  },
             "2": {
-                  "instruction_name": "instruction_lab_2.docx", 
-                  "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel",
-                  "employees": ["Иванов И.М.", "Коробова П.Н", "Морозов И.Р.", "Петров Г.Т.", "Ромашова П.Т.", "Смирнов С.И.", "Соколова О.С."] 
+                  "instruction_name": "Лабораторная 2. Указания к работе.docx", 
+                  "template_name": "lab2_template.xlsx",
+                  "correct_name": "lab2_correct.xlsx",
+                  "name": "Построение графиков функций"
+                 },
+            "3": {
+                  "instruction_name": "Лабораторная 3. Указания к работе.docx",
+                  "template_name": "lab3_template.xlsx",
+                  "correct_name": "lab3_correct.xlsx",
+                  "name": "Сортировка, фильтры и промежуточные итоги"
                  },
         },
         scope=Scope.settings
@@ -102,16 +105,18 @@ class XlsxCheckerXBlock(XBlock):
          help='Link for template download',
         )
 
+    correct_link = String(
+         default='', scope=Scope.settings,
+         help='Link for correct file',
+        )
+
     xlsx_analyze = JSONField(
          default={}, 
          scope=Scope.user_state,
          help='Analyze document',
         )
 
-    correct_link = String(
-         default='', scope=Scope.settings,
-         help='Link for correct file',
-        )
+
 
     correct_xlsx_uid = String(
          default='', scope=Scope.settings,
@@ -223,7 +228,7 @@ class XlsxCheckerXBlock(XBlock):
 
         load_resources(js_urls, css_urls, fragment)
 
-        fragment.initialize_js('XlsxCheckerXBlock', {'xlsx_analyze': self.xlsx_analyze, 'lab_scenario': self.lab_scenario})
+        fragment.initialize_js('XlsxCheckerXBlock', {'xlsx_analyze': self.xlsx_analyze, 'lab_scenario': self.lab_scenario, 'student_xlsx_name': self.student_xlsx_name})
         return fragment
 
     def studio_view(self, context=None):
@@ -284,13 +289,13 @@ class XlsxCheckerXBlock(XBlock):
         result = {}
         student_path = self._students_storage_path(self.student_xlsx_uid, self.student_xlsx_name)
         
-        if str(self.lab_scenario) == "0":
+        if str(self.lab_scenario) == "1":
             student_wb =  load_workbook(default_storage.open(student_path))
             student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
             result = lab_1_check_answer(student_wb, student_wb_data_only)
             self.xlsx_analyze = result
 
-        if str(self.lab_scenario) == "1":
+        if str(self.lab_scenario) == "2":
             correct_wb = load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab1_correct.xlsx')
             correct_wb_data_only =  load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab1_correct.xlsx', data_only=True)
 
@@ -299,7 +304,7 @@ class XlsxCheckerXBlock(XBlock):
             result = lab_2_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only)
             self.xlsx_analyze = result
 
-        if str(self.lab_scenario) == "2":
+        if str(self.lab_scenario) == "3":
             data = [
                 ["Комбайн", "19.07.2017", 100, 7800.00],
                 ["Миксер", "30.05.2017", 38, 3000.00],
@@ -317,16 +322,13 @@ class XlsxCheckerXBlock(XBlock):
                 ["Чайник", "27.07.2016", 102, 1200.00],
                 ["Чайник", "04.08.2016", 45, 500.00],
             ]
-            pass
-            # correct_wb = load_workbook('lab3_correct.xlsx')
-            # correct_wb_data_only =  load_workbook('lab3_correct.xlsx', data_only=True)
-
-            # # Проверка
-            # student_wb =  load_workbook('lab3_student.xlsx')
-            # student_wb_data_only =  load_workbook('lab3_correct.xlsx', data_only=True)
-
-            # result = lab_3_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only, data)
-
+            correct_wb = load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab3_correct.xlsx')
+            correct_wb_data_only =  load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab3_correct.xlsx', data_only=True)
+            # Проверка
+            student_wb =  load_workbook(default_storage.open(student_path))
+            student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
+            result = lab_3_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only, data)
+            self.xlsx_analyze = result
 
         grade_global = check_answer()
         self.points = grade_global
@@ -349,22 +351,22 @@ class XlsxCheckerXBlock(XBlock):
         self.lab_scenario = data.get('lab_scenario')
 
         self.instruction_link = self.scenarios_settings[str(self.lab_scenario)]["instruction_name"]
-
-        if str(self.lab_scenario) == "0":
-            template_wb = Workbook()
-            template_ws = template_wb.active
-            template_ws = lab_1_create_template(template_ws)
-            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/lab0_template.xlsx')
-            self.template_link = 'lab0_template.xlsx'
+        self.template_link = self.scenarios_settings[str(self.lab_scenario)]["template_name"]
+        self.correct_link = self.runtime.local_resource_url(self, 'corrects/' + self.scenarios_settings[str(self.lab_scenario)]["correct_name"])
 
         if str(self.lab_scenario) == "1":
             template_wb = Workbook()
-            template_wb = lab_2_create_template(template_wb)
-            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/lab1_template.xlsx')
-            self.template_link = 'lab1_template.xlsx'
-            self.correct_link = self.runtime.local_resource_url(self, 'corrects/lab1_correct.xlsx')
+            template_ws = template_wb.active
+            template_ws = lab_1_create_template(template_ws)
+            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/' + self.template_link)
+            
 
         if str(self.lab_scenario) == "2":
+            template_wb = Workbook()
+            template_wb = lab_2_create_template(template_wb)
+            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/' + self.template_link)
+
+        if str(self.lab_scenario) == "3":
             data = [
                     ["Комбайн", "19.07.2017", 100, 7800.00],
                     ["Миксер", "30.05.2017", 38, 3000.00],
@@ -385,9 +387,7 @@ class XlsxCheckerXBlock(XBlock):
             template_wb = Workbook()
             template_ws = template_wb.active
             template_ws = lab_3_create_template(template_ws, data)
-            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/lab2_template.xlsx')
-            self.template_link = 'lab2_template.xlsx'
-            self.correct_link = self.runtime.local_resource_url(self, 'corrects/lab2_correct.xlsx')
+            template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/' + self.template_link)
 
         return {'result': 'success'}
 

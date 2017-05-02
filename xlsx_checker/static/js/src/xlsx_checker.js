@@ -3,10 +3,21 @@ function XlsxCheckerXBlock(runtime, element, data) {
 
    var xlsx_analyze = data["xlsx_analyze"];  
    var lab_scenario = data["lab_scenario"];
+   var student_xlsx_name = data["student_xlsx_name"];
    if(xlsx_analyze != {}){
-   	showLab1Analyze(xlsx_analyze);
+       //showLab1Analyze(xlsx_analyze);
+   }
+   else{
+       $('.block-analyze', element).hide();
    }
    
+   if(student_xlsx_name){
+    $('.current-student-file', element).show();
+   }
+   else{
+    $('.current-student-file', element).hide();
+   }
+
    var upload_student_file = runtime.handlerUrl(element, 'upload_student_file');
 
    var download_student_file = runtime.handlerUrl(element, 'download_student_file');
@@ -24,40 +35,48 @@ function XlsxCheckerXBlock(runtime, element, data) {
             type: 'GET',
             success: function(result){
                 $('.download_student_file', element).html(result["student_filename"]);
+                $('.current-student-file', element).show();
             }
 
         });
     }
 
     $(':button.upload-student-file').on('click', function() {
-        $.ajax({
-            url: upload_student_file,
-            type: 'POST',
-            data: new FormData($('form.student')[0]),
-            cache: false,
-            contentType: false,
-            processData: false,
-            xhr: function() {
-                var myXhr = $.ajaxSettings.xhr();
-                if (myXhr.upload) {
-                    myXhr.upload.addEventListener('progress', function(evt) {
-                        if (evt.lengthComputable) {
-                            //Сделать лоадер
-                        }
-                    } , false);
-                }
-                return myXhr;
-            },
-            success: successLoadStudentFile
+        var file = $('input[name="studentFile"]').val().trim();
+        if(file){
+            $.ajax({
+                url: upload_student_file,
+                type: 'POST',
+                data: new FormData($('form.student')[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                xhr: function() {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function(evt) {
+                            if (evt.lengthComputable) {
+                                //Сделать лоадер
+                            }
+                        } , false);
+                    }
+                    return myXhr;
+                },
+                success: successLoadStudentFile
 
-        });
+            });
+        }
+        else{
+            alert("Необходимо  выбрать документ!");
+        }
     });
 
+
     function showLab1Analyze(analyze_object){
-    	$('.analyze-all', element).empty()
-        $('.analyze-errors', element).empty()
-        $('.global-errors', element).empty()
-        analyze = analyze_object
+    	$('.analyze-all', element).empty();
+        $('.analyze-errors', element).empty();
+        $('.global-errors', element).empty();
+        analyze = analyze_object;
         if(analyze["errors"].length > 0){
                 var errors = document.createElement("div");
                 analyze["errors"].forEach(function(item, i, arr) {
@@ -134,14 +153,27 @@ function XlsxCheckerXBlock(runtime, element, data) {
         }
     }
 
+
     function successCheck(result) {
+        console.log(result);
         updatePointsAttempts(result)
-        showLab1Analyze(result["xlsx_analyze"]);
+        if(lab_scenario == 1){
+            showLab1Analyze(result["xlsx_analyze"])
+        }
+        else if(lab_scenario == 2){
+            //showLab2Analyze(result["xlsx_analyze"])
+        }
+        else if(lab_scenario == 3){
+            //showLab3Analyze(result["xlsx_analyze"])
+        }
+
+        $('.block-analyze', element).show(300);
 
     }
 
     $(element).find('.Check').bind('click', function() {
         console.log("CHECK");
+        $('.block-analyze', element).hide();
         $.ajax({
             type: "POST",
             url: student_submit,

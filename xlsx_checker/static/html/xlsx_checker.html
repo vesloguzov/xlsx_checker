@@ -1,77 +1,75 @@
 <div class="problem">
-
-
-
-<div class="problem-progress">
+	<div class="problem-progress">
         {% if points == 0 or points %}
             <me-span class="weight"> Набрано баллов: <me-span class="points">{{points}} из {{weight}}</me-span></me-span>
         {% else %}
             <me-span class="weight">(Максимальное кoличество баллов: {{weight}})</me-span>
         {% endif %}
     </div>   
+    <h2 class="problem-header">{{display_name}}</h2>
 
+ 	{% if lab_scenario != 9999 %}
 
-        <h2 class="problem-header">{{display_name}}</h2>
+	    {% if question != '' and question != "None" %}
+	        <div id="question">{{question|safe}}</div>
+	    {% endif %}
 
- {% if lab_scenario != 9999 %}
+	    <a class="download_instruction" href="{{instruction_link}}">Скачать инструкцию</a><br />
+	    <a class="template_link" href="{{template_link}}">Скачать шаблон для задания</a>
 
-        {% if question != '' and question != "None" %}
+	    <div class="file-upload-block">
+		    
+		    <div class="current-student-file">
+		        <p>Ваш загруженный документ: <a class="download_student_file">{{student_xlsx_name}}<a/></p>
+		    </div>
 
-            <div id="question">{{question|safe}}</div>
-        {% endif %}
+		    <div class="upload-block">
 
-        <a class="download_instruction" href="{{instruction_link}}">Скачать инструкцию</a><br />
-        <a class="template_link" href="{{template_link}}">Скачать шаблон для задания</a>
+		            <form enctype="multipart/form-data" class="student">
+		            <p>Загрузка файла</p>
+		                <input type="file" class="student-file" name="studentFile" accept=".xlsx"/>
+		                <input type="button" value="Загрузить документ для проверки"  class="upload-student-file"/>
+		            </form>
+		    </div>
+	    </div>
 
-    {% if student_xlsx_name != '' %}
-        <p>Загруженный файл</p>
-        <a class="download_student_file">{{student_xlsx_name}}<a/>
+	    <div class="block-analyze">
+	    <h3>Анализ документа</h3>
+		    <div>
+		        <p>Глобальные ошибки:</p>
+		        <div class="global-errors"></div>
+		    </div>
+		    <div>
+		        <p>Ошибки:</p>
+		        <div class="analyze-errors"></div>
+		    </div>
+		    <div>
+		        <p>Полный анализ:</p>
+		        <div class="analyze-all"></div>
+		    </div>
+		</div>
+
+	    <div class="action">
+	            {% if past_due and answer_opportunity %}
+	                <button class="check Check" data-checking="Проверка..." data-value="Проверить/последняя попытка"><span class="check-label">Проверить</span><span class="sr"> ваш ответ</span></button>
+	                <div class="submission_feedback" aria-live="polite">
+	                {% if max_attempts %}
+	                    Использовано попыток: <me-span class="attempts">{{attempts}}</me-span> из {{max_attempts}} 
+	                {% endif %}
+	                </div>
+	            {% elif past_due %}
+	                <div class="submission_feedback" aria-live="polite">
+	                    Использовано попыток: <me-span class="attempts">{{attempts}}</me-span> из {{max_attempts}} 
+	                </div>
+	            {% elif answer_opportunity %}
+	                <div class="submission_feedback" aria-live="polite">
+	                    Использовано попыток: <me-span class="attempts">{{attempts}}</me-span> из {{max_attempts}} <br />Время для ответа истекло
+	                </div>
+	            {% endif %}
+	    </div>
+
+    {% else %}
+        <p>Задание еще не настроено!</p>
     {% endif %}
-
-    <div class="upload-block">
-            <form enctype="multipart/form-data" class="student">
-                <input type="file" class="student-file" name="studentFile" accept=".xlsx"/>
-                <input type="button" value="Загрузить"  class="upload-student-file"/>
-            </form>
-    </div>
-
-    <div>
-        <p>Глобальные ошибки:</p>
-        <div class="global-errors"></div>
-    </div>
-    
-    <div>
-        <p>Ошибки:</p>
-        <div class="analyze-errors"></div>
-    </div>
-
-    <div>
-        <p>Полный анализ:</p>
-        <div class="analyze-all"></div>
-    </div>
-
-    <div class="action">
-            {% if past_due and answer_opportunity %}
-                <button class="check Check" data-checking="Проверка..." data-value="Проверить/последняя попытка"><span class="check-label">Проверить</span><span class="sr"> ваш ответ</span></button>
-                <div class="submission_feedback" aria-live="polite">
-                {% if max_attempts %}
-                    Использовано попыток: <me-span class="attempts">{{attempts}}</me-span> из {{max_attempts}} 
-                {% endif %}
-                </div>
-            {% elif past_due %}
-                <div class="submission_feedback" aria-live="polite">
-                    Использовано попыток: <me-span class="attempts">{{attempts}}</me-span> из {{max_attempts}} 
-                </div>
-            {% elif answer_opportunity %}
-                <div class="submission_feedback" aria-live="polite">
-                    Использовано попыток: <me-span class="attempts">{{attempts}}</me-span> из {{max_attempts}} <br />Время для ответа истекло
-                </div>
-            {% endif %}
-
-    </div>
-
-        {% else %}
-            <p>Задание еще не настроено!</p>
-        {% endif %}
 
 </div> 
