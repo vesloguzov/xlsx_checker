@@ -4,8 +4,27 @@ function XlsxCheckerXBlock(runtime, element, data) {
    var xlsx_analyze = data["xlsx_analyze"];  
    var lab_scenario = data["lab_scenario"];
    var student_xlsx_name = data["student_xlsx_name"];
+
    if(xlsx_analyze != {}){
-       //showLab1Analyze(xlsx_analyze);
+    console.log(xlsx_analyze)
+       try{
+        console.log("START");
+            if(lab_scenario == 1){
+                console.log("LAB1");
+                showLab1FullAnalyze(xlsx_analyze);
+            }
+            else if(lab_scenario == 2){
+                console.log("LAB2");
+                showLab2FullAnalyze(xlsx_analyze);
+            }
+            else if(lab_scenario == 3){
+                console.log("LAB3");
+                showLab3FullAnalyze(xlsx_analyze);
+            }
+        }
+        catch(err){
+            console.log("errors")
+        }
    }
    else{
        $('.block-analyze', element).hide();
@@ -71,100 +90,200 @@ function XlsxCheckerXBlock(runtime, element, data) {
         }
     });
 
-
-    function showLab1Analyze(analyze_object){
-    	$('.analyze-all', element).empty();
-        $('.analyze-errors', element).empty();
-        $('.global-errors', element).empty();
+    function showLab1FullAnalyze(analyze_object){
         analyze = analyze_object;
-        if(analyze["errors"].length > 0){
-                var errors = document.createElement("div");
-                analyze["errors"].forEach(function(item, i, arr) {
-                    var criterion_element_error = document.createElement("div");
-                    criterion_element_error.innerHTML = item;
-                    errors.appendChild(criterion_element_error);
+        $('.analyze-all', element).empty();
+        // delete analyze["errors"];
 
-                });
-            $('.global-errors', element).append(errors)
-        }
-        else{
-            Object.keys(analyze).map(function(item, i, arr) {
+        Object.keys(analyze).map(function(item, i, arr) {
                 var one_obj = analyze[item]
-                var criterion_error = document.createElement("div");
-                criterion_error.className = 'error' + item;
-
                 var criterion_all = document.createElement("div");
-                criterion_all.className = item;
+                criterion_all.className = item + " criterion-block";    
 
+                var criterion_header = document.createElement("div");
                 if (item == "conditional_formatting"){
-                        var criterion_element_all = document.createElement("div");
-                        criterion_element_all.innerHTML = one_obj["message"];
-                        criterion_all.appendChild(criterion_element_all);
-                        if (one_obj["status"] == false){
-                            var criterion_element_error = document.createElement("div");
-                            criterion_element_error.innerHTML = one_obj["message"];
+                        criterion_header.innerHTML = "Условное форматирование";
+                        criterion_all.appendChild(criterion_header);
 
-                            criterion_error.appendChild(criterion_element_error);
-                        }
+                        var criterion_element_all = document.createElement("p");
+                        criterion_element_all.innerHTML = one_obj["message"];
+                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj["status"];
+                        criterion_all.appendChild(criterion_element_all);
                 }
                 if (item == "formats"){
-                    Object.keys(one_obj).map(function(item, i, arr) {
-                        var criterion_element_all = document.createElement("div");
-                        criterion_element_all.innerHTML = one_obj[item]["message"];
-                        criterion_all.appendChild(criterion_element_all);
-                        if (one_obj[item]["status"] == false){
-                            var criterion_element_error = document.createElement("div");
-                            criterion_element_error.innerHTML = one_obj[item]["message"];
+                    criterion_header.innerHTML = "Форматирование ячеек";
+                    criterion_all.appendChild(criterion_header);
 
-                            criterion_error.appendChild(criterion_element_error);
-                        }
+                    Object.keys(one_obj).map(function(item, i, arr) {
+                        var criterion_element_all = document.createElement("p");
+                        criterion_element_all.innerHTML = one_obj[item]["message"];
+                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                        criterion_all.appendChild(criterion_element_all);
                     });
                 }
                 if (item == "functions"){
-                    Object.keys(one_obj).map(function(item, i, arr) {
-                        var criterion_element_all = document.createElement("div");
-                        criterion_element_all.innerHTML = one_obj[item]["message"];
-                        criterion_all.appendChild(criterion_element_all);
-                        if (one_obj[item]["status"] == false){
-                            var criterion_element_error = document.createElement("div");
-                            criterion_element_error.innerHTML = one_obj[item]["message"];
+                    criterion_header.innerHTML = "Применение функций";
+                    criterion_all.appendChild(criterion_header);
 
-                            criterion_error.appendChild(criterion_element_error);
-                        }
+                    Object.keys(one_obj).map(function(item, i, arr) {
+                        var criterion_element_all = document.createElement("p");
+                        criterion_element_all.innerHTML = one_obj[item]["message"];
+                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                        criterion_all.appendChild(criterion_element_all);
                     });
                 }
                 if (item == "formulas"){
-                    Object.keys(one_obj).map(function(item, i, arr) {
-                        var criterion_element_all = document.createElement("div");
-                        criterion_element_all.innerHTML = one_obj[item]["message"];
-                        criterion_all.appendChild(criterion_element_all);
-                        if (one_obj[item]["status"] == false){
-                            var criterion_element_error = document.createElement("div");
-                            criterion_element_error.innerHTML = one_obj[item]["message"];
+                    criterion_header.innerHTML = "Использование формул";
+                    criterion_all.appendChild(criterion_header);
 
-                            criterion_error.appendChild(criterion_element_error);
+                    Object.keys(one_obj).map(function(item, i, arr) {
+                        var criterion_element_all = document.createElement("p");
+                        criterion_element_all.innerHTML = one_obj[item]["message"];
+                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                        criterion_all.appendChild(criterion_element_all);
+                    });
+                }
+                if (item == "charts"){
+                    criterion_header.innerHTML = "Графики";
+                    criterion_all.appendChild(criterion_header);
+
+                }
+                
+                $('.analyze-all', element).append(criterion_all);
+            });
+    }
+
+    function showLab2FullAnalyze(analyze_object){
+        analyze = analyze_object;
+        $('.analyze-all', element).empty();
+        // delete analyze["errors"];
+
+        Object.keys(analyze).map(function(item, i, arr) {
+                var one_obj = analyze[item]
+                var criterion_all = document.createElement("div");
+                criterion_all.className = item + " criterion-block";    
+
+                var criterion_header = document.createElement("div");
+
+               if (item == "ws1"){
+                    criterion_header.innerHTML = "График 1";
+                    criterion_all.appendChild(criterion_header);
+                    Object.keys(one_obj).map(function(item, i, arr) {
+                        if (item == "data"){
+                            var criterion_element_all = document.createElement("p");
+                            criterion_element_all.innerHTML = one_obj[item]["message"];
+                            criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                            criterion_all.appendChild(criterion_element_all);
+                        }
+                        // if (item == "graphic"){
+                        //     var criterion_element_all = document.createElement("p");
+                        //     criterion_element_all.innerHTML = one_obj[item]["message"];
+                        //     criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                        //     criterion_all.appendChild(criterion_element_all);
+                        // }
+                    });
+                }
+
+                if (item == "ws2"){
+                    criterion_header.innerHTML = "График 2";
+                    criterion_all.appendChild(criterion_header);
+                    Object.keys(one_obj).map(function(item, i, arr) {
+                        if (item == "data"){
+                            var criterion_element_all = document.createElement("p");
+                            criterion_element_all.innerHTML = one_obj[item]["message"];
+                            criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                            criterion_all.appendChild(criterion_element_all);
+                        }
+                        // if (item == "graphic"){
+                        //     var criterion_element_all = document.createElement("p");
+                        //     criterion_element_all.innerHTML = one_obj[item]["message"];
+                        //     criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                        //     criterion_all.appendChild(criterion_element_all);
+                        // }
+                    });
+                }
+                
+                $('.analyze-all', element).append(criterion_all);
+            });
+    }
+
+    function showLab3FullAnalyze(analyze_object){
+        analyze = analyze_object;
+        $('.analyze-all', element).empty();
+        // delete analyze["errors"];
+
+        Object.keys(analyze).map(function(item, i, arr) {
+                var one_obj = analyze[item]
+                var criterion_all = document.createElement("div");
+                criterion_all.className = item + " criterion-block";    
+
+                var criterion_header = document.createElement("div");
+                if (item == "sort"){
+                        criterion_header.innerHTML = "Сортировка товара";
+                        criterion_all.appendChild(criterion_header);
+
+                        var criterion_element_all = document.createElement("p");
+                        criterion_element_all.innerHTML = one_obj["message"];
+                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj["status"];
+                        criterion_all.appendChild(criterion_element_all);
+                }
+                
+                if (item == "results"){
+                        criterion_header.innerHTML = "Лист итогов";
+                        criterion_all.appendChild(criterion_header);
+
+                        var criterion_element_all = document.createElement("p");
+                        criterion_element_all.innerHTML = one_obj["message"];
+                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj["status"];
+                        criterion_all.appendChild(criterion_element_all);
+                }
+
+                if (item == "formats"){
+                    criterion_header.innerHTML = "Форматирование ячеек";
+                    criterion_all.appendChild(criterion_header);
+                    Object.keys(one_obj).map(function(item, i, arr) {
+                        var criterion_element_all = document.createElement("p");
+                        criterion_element_all.innerHTML = one_obj[item]["message"];
+                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                        criterion_all.appendChild(criterion_element_all);
+                    });
+                }
+
+               if (item == "filters"){
+                    criterion_header.innerHTML = "Фильтрация";
+                    criterion_all.appendChild(criterion_header);
+                    Object.keys(one_obj).map(function(item, i, arr) {
+                        if (item == "custom"){
+                            var criterion_element_all = document.createElement("p");
+                            criterion_element_all.innerHTML = one_obj[item]["message"];
+                            criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                            criterion_all.appendChild(criterion_element_all);
+                        }
+                        if (item == "year"){
+                            var criterion_element_all = document.createElement("p");
+                            criterion_element_all.innerHTML = one_obj[item]["message"];
+                            criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
+                            criterion_all.appendChild(criterion_element_all);
                         }
                     });
                 }
-        
-                $('.analyze-errors', element).append(criterion_error);
+                
                 $('.analyze-all', element).append(criterion_all);
             });
-        }
     }
 
-
     function successCheck(result) {
-        console.log(result);
+        console.log("result", result);
         updatePointsAttempts(result)
         if(lab_scenario == 1){
-            showLab1Analyze(result["xlsx_analyze"])
+
+            showLab1FullAnalyze(result["xlsx_analyze"]);
         }
         else if(lab_scenario == 2){
-            //showLab2Analyze(result["xlsx_analyze"])
+            showLab2FullAnalyze(result["xlsx_analyze"])
         }
         else if(lab_scenario == 3){
-            //showLab3Analyze(result["xlsx_analyze"])
+            showLab3FullAnalyze(result["xlsx_analyze"])
         }
 
         $('.block-analyze', element).show(300);

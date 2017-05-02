@@ -20,6 +20,7 @@ response_message["ws2"] = {}
 response_message["ws2"]["data"] = {}
 response_message["ws2"]["graphic"] = {}
 
+response_message["errors"] = []
 
 def check_ranges_equal(ws_correct, ws_student, range):
     correct_rows = ws_correct[range]
@@ -43,27 +44,34 @@ def check_ranges_equal(ws_correct, ws_student, range):
     return correct_list == student_list
 
 def lab_2_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only):
-    student_ws_1 = student_wb[student_wb.get_sheet_names()[0]]
-    student_ws_2 = student_wb[student_wb.get_sheet_names()[1]]
-    correct_ws_1 = correct_wb[correct_wb.get_sheet_names()[0]]
-    correct_ws_2 = correct_wb[correct_wb.get_sheet_names()[1]]
+    response_message["errors"] = []
+    print "OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!22222222222222222"
 
-    ws1_data_range = 'A4:B28'
+    if (len(student_wb.get_sheet_names()) == 2):
+        print "OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        student_ws_1 = student_wb[student_wb.get_sheet_names()[0]]
+        student_ws_2 = student_wb[student_wb.get_sheet_names()[1]]
+        correct_ws_1 = correct_wb[correct_wb.get_sheet_names()[0]]
+        correct_ws_2 = correct_wb[correct_wb.get_sheet_names()[1]]
 
-    if check_ranges_equal(correct_ws_1, student_ws_1, ws1_data_range):
-        response_message["ws1"]["data"]["status"] = True
-        response_message["ws1"]["data"]["message"] = "Данные для графика посчитаны верно"
+        ws1_data_range = 'A4:B28'
+
+        if check_ranges_equal(correct_ws_1, student_ws_1, ws1_data_range):
+            response_message["ws1"]["data"]["status"] = True
+            response_message["ws1"]["data"]["message"] = "Данные для графика посчитаны верно"
+        else:
+            response_message["ws1"]["data"]["status"] = False
+            response_message["ws1"]["data"]["message"] = "Данные для графика посчитаны неверно"
+
+        ws2_data_range = 'A4:B34'
+
+        if check_ranges_equal(correct_ws_2, student_ws_2, ws2_data_range):
+            response_message["ws2"]["data"]["status"] = True
+            response_message["ws2"]["data"]["message"] = "Данные для графика посчитаны верно"
+        else:
+            response_message["ws2"]["data"]["status"] = False
+            response_message["ws2"]["data"]["message"] = "Данные для графика посчитаны неверно"
     else:
-        response_message["ws1"]["data"]["status"] = False
-        response_message["ws1"]["data"]["message"] = "Данные для графика посчитаны неверно"
-
-    ws2_data_range = 'A4:B34'
-
-    if check_ranges_equal(correct_ws_2, student_ws_2, ws2_data_range):
-        response_message["ws2"]["data"]["status"] = True
-        response_message["ws2"]["data"]["message"] = "Данные для графика посчитаны верно"
-    else:
-        response_message["ws2"]["data"]["status"] = False
-        response_message["ws2"]["data"]["message"] = "Данные для графика посчитаны неверно"
-
+        print "OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!3333333333333333333"
+        response_message["errors"].append('Документ должен содержать два рабочих листа')
     return response_message

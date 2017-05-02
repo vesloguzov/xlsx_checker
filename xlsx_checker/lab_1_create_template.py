@@ -70,7 +70,7 @@ def lab_1_create_template(ws):
             if j == 3:
                 ws.cell(row=pos_i, column=j).value = positions[i-1]
             if j == 4:
-                ws.cell(row=pos_i, column=j).value = randomDate()
+                ws.cell(row=pos_i, column=j).value = datetime.datetime.strptime(randomDate(), "%d.%m.%Y")
                 ws.cell(row=pos_i, column=j).number_format = 'DD/MM/YY'
                 # ws.cell(row=pos_i, column=j).number_format = 'YYYY.MM.DD'
 

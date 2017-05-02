@@ -41,6 +41,39 @@
 
 .block-analyze{
 	padding: 10px;
-    background: #ececec;
+    /*background: #ececec;*/
     margin: 30px 0px;
+}
+
+.analyze-all .criterion-complete-false{
+	background: rgba(255, 138, 138, 0.27);
+}
+
+.analyze-all .criterion-complete-true{
+	background: rgba(125, 204, 125, 0.19);
+}
+
+.one-criterion {
+    margin: 0px 30px !important;
+    padding: 2px;
+}
+
+.criterion-block {
+    padding: 0px 0px 10px 0px;
+}
+
+.criterion-block div{
+	font-size: 1.1em;
+    padding: 6px 0px;
+}
+
+.main-block-analyze{
+	border: 2px solid #c1c1c1;
+    padding: 0px 18px;
+    margin: 10px 0px;
+}
+
+.main-block-analyze h3{
+    text-align: center;
+    padding: 10px 0px;
 }

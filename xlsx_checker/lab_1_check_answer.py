@@ -7,7 +7,7 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.chart import ScatterChart, Series, Reference
 from openpyxl.chart.reader import reader
 from openpyxl.chart.layout import Layout, ManualLayout
-from labs_utils import range_is_date_format, range_is_money_rub_format, range_is_money_dollar_format, formulas_is_equal
+from labs_utils import range_is_date_format, range_is_money_rub_format, range_is_money_dollar_format, formulas_is_equal, approx_equal
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -71,19 +71,19 @@ def calculate_correct_values(ws, range, employees, dollar_rate):
 
         for index, v in enumerate(data["salary"]["values"]):
 
-            premium_val = v * 0.2
+            premium_val = round(v * 0.2, 1)
             premium.append(premium_val)
             premium_formula.append('=0,2*E'+str(index+5))
 
-            total_val = premium_val + v
+            total_val = round(premium_val + v, 1)
             total.append(total_val)
             total_formula.append('=F'+str(index+5)+'+E'+str(index+5))
 
-            income_tax_val = round(total_val*0.13, 2)
+            income_tax_val = round(total_val*0.13, 1)
             income_tax.append(income_tax_val)
             income_tax_formula.append('=G'+str(index+5)+'*0,13')
 
-            amount_granted_val = (total_val - income_tax_val)
+            amount_granted_val = round((total_val - income_tax_val), 1)
             amount_granted.append(amount_granted_val)
             amount_granted_formula.append('=G'+str(index+5)+'-H'+str(index+5))
 
@@ -201,8 +201,21 @@ def check_formats(student_ws):
 
 def formula_contain_percent(formulas, percent):
     for formula in formulas:
-        if not '0,'+str(percent) in formula and str(percent) + '%' in formula:
+        if not '0,'+str(percent) in formula and '%' in formula:
             return False
+    return True
+
+def is_formula_contain_percent(formulas, percent):
+    if percent % 10 == 0:
+        percent = str(percent)[0]
+    print percent
+    for formula in formulas:
+        if formula.replace(" ", "")[0] != '=':
+            if not '0,'+str(percent) in formula:
+                if not '%' in formula:
+                    return False
+            return False
+
     return True
 
 def check_formulas(ws, ws_read_only, correct_data):
@@ -239,8 +252,9 @@ def check_formulas(ws, ws_read_only, correct_data):
 
     # Проверяем премии
     premium = get_range_data(ws, 'F5:F11', ws_read_only)
+
     response_message["formulas"]["premium"] = {}
-    if premium and formula_contain_percent(premium["formula"], 20) and premium["values"] == correct_data["premium"]["values"]:
+    if premium and is_formula_contain_percent(premium["formula"], 20) and premium["values"] == correct_data["premium"]["values"]:
         response_message["formulas"]["premium"]["status"] = True
         response_message["formulas"]["premium"]["message"] = "Столбец премии посчитан верно"
     else:
@@ -250,7 +264,7 @@ def check_formulas(ws, ws_read_only, correct_data):
     # Проверяем подоходный налог
     income_tax = get_range_data(ws, 'H5:H11', ws_read_only)
     response_message["formulas"]["income_tax"] = {}
-    if income_tax and formula_contain_percent(income_tax["formula"], 13) and income_tax["values"] == correct_data["income_tax"]["values"]:
+    if income_tax and is_formula_contain_percent(income_tax["formula"], 13) and income_tax["values"] == correct_data["income_tax"]["values"]:
         response_message["formulas"]["income_tax"]["status"] = True
         response_message["formulas"]["income_tax"]["message"] = "Столбец подоходный налог посчитан верно"
     else:
@@ -262,7 +276,7 @@ def check_functions(ws, ws_read_only, correct_data):
     # Проверяем сумму Итого
     total_sum_cell = 'G12'
     response_message["functions"]["total_sum"] = {}
-    if formulas_is_equal(ws[total_sum_cell].value, correct_data["total_sum"]["formula"]) and round(ws_read_only[total_sum_cell].value, 1) == round(correct_data["total_sum"]["values"], 1):
+    if formulas_is_equal(ws[total_sum_cell].value, correct_data["total_sum"]["formula"]) and approx_equal(round(ws_read_only[total_sum_cell].value, 1), round(correct_data["total_sum"]["values"], 1)):
         response_message["functions"]["total_sum"]["status"] = True
         response_message["functions"]["total_sum"]["message"] = "Сумма по столбцу Итого посчитана верно"
     else:
@@ -272,7 +286,7 @@ def check_functions(ws, ws_read_only, correct_data):
     # Проверяем сумму подоходных налогов
     income_tax_sum_cell = 'H12'
     response_message["functions"]["income_tax_sum"] = {}
-    if formulas_is_equal(ws[income_tax_sum_cell].value, correct_data["income_tax_sum"]["formula"]) and round(ws_read_only[income_tax_sum_cell].value, 1) == round(correct_data["income_tax_sum"]["values"], 1):
+    if formulas_is_equal(ws[income_tax_sum_cell].value, correct_data["income_tax_sum"]["formula"]) and approx_equal(round(ws_read_only[income_tax_sum_cell].value, 1), round(correct_data["income_tax_sum"]["values"], 1)):
         response_message["functions"]["income_tax_sum"]["status"] = True
         response_message["functions"]["income_tax_sum"]["message"] = "Сумма подоходного налога посчитана верно"
     else:
@@ -284,7 +298,7 @@ def check_functions(ws, ws_read_only, correct_data):
     response_message["functions"]["amount_granted_sum"] = {}
 
 
-    if formulas_is_equal(ws[amount_granted_sum_cell].value, correct_data["amount_granted_sum"]["formula"]) and round(ws_read_only[amount_granted_sum_cell].value, 1) == round(correct_data["amount_granted_sum"]["values"], 1):
+    if formulas_is_equal(ws[amount_granted_sum_cell].value, correct_data["amount_granted_sum"]["formula"]) and approx_equal(round(ws_read_only[amount_granted_sum_cell].value, 1), round(correct_data["amount_granted_sum"]["values"], 1)):
         response_message["functions"]["amount_granted_sum"]["status"] = True
         response_message["functions"]["amount_granted_sum"]["message"] = "Сумма зарплат к выдаче в рублях посчитана верно"
     else:
@@ -296,7 +310,7 @@ def check_functions(ws, ws_read_only, correct_data):
     amount_granted_dollar_sum_cell = 'J12'
     response_message["functions"]["amount_granted_dollar_sum"] = {}
     
-    if formulas_is_equal(ws[amount_granted_dollar_sum_cell].value, correct_data["amount_granted_dollar_sum"]["formula"]) and int(ws_read_only[amount_granted_dollar_sum_cell].value) == int(correct_data["amount_granted_dollar_sum"]["values"]):
+    if formulas_is_equal(ws[amount_granted_dollar_sum_cell].value, correct_data["amount_granted_dollar_sum"]["formula"]) and approx_equal(int(ws_read_only[amount_granted_dollar_sum_cell].value), int(correct_data["amount_granted_dollar_sum"]["values"])):
         response_message["functions"]["amount_granted_dollar_sum"]["status"] = True
         response_message["functions"]["amount_granted_dollar_sum"]["message"] = "Сумма зарплат к выдаче в долларах посчитана верно"
     else:
@@ -306,7 +320,7 @@ def check_functions(ws, ws_read_only, correct_data):
     # Проверяем среднее значение суммы к выдаче
     avg_salary_sum_cell = 'C15'
     response_message["functions"]["avg_salary"] = {}
-    if formulas_is_equal(ws[avg_salary_sum_cell].value, correct_data["avg_salary"]["formula"]) and round(ws_read_only[avg_salary_sum_cell].value, 1) == round(correct_data["avg_salary"]["values"], 1):
+    if formulas_is_equal(ws[avg_salary_sum_cell].value, correct_data["avg_salary"]["formula"]) and approx_equal(round(ws_read_only[avg_salary_sum_cell].value, 1), round(correct_data["avg_salary"]["values"], 1)):
         response_message["functions"]["avg_salary"]["status"] = True
         response_message["functions"]["avg_salary"]["message"] = "Среднее значение зарплаты посчитано верно"
     else:
@@ -316,7 +330,7 @@ def check_functions(ws, ws_read_only, correct_data):
     # Проверяем максимальное значение суммы к выдаче
     max_salary_sum_cell = 'C16'
     response_message["functions"]["max_salary"] = {}
-    if formulas_is_equal(ws[max_salary_sum_cell].value, correct_data["max_salary"]["formula"]) and round(ws_read_only[max_salary_sum_cell].value, 1) == round(correct_data["max_salary"]["values"], 1):
+    if formulas_is_equal(ws[max_salary_sum_cell].value, correct_data["max_salary"]["formula"]) and approx_equal(round(ws_read_only[max_salary_sum_cell].value, 1), round(correct_data["max_salary"]["values"], 1)):
         response_message["functions"]["max_salary"]["status"] = True
         response_message["functions"]["max_salary"]["message"] = "Максимальное значение зарплаты посчитано верно"
     else:
@@ -326,7 +340,7 @@ def check_functions(ws, ws_read_only, correct_data):
     # Проверяем минимальное значение суммы к выдаче
     min_salary_sum_cell = 'C17'
     response_message["functions"]["min_salary"] = {}
-    if formulas_is_equal(ws[min_salary_sum_cell].value, correct_data["min_salary"]["formula"]) and round(ws_read_only[min_salary_sum_cell].value, 1) == round(correct_data["min_salary"]["values"], 1):
+    if formulas_is_equal(ws[min_salary_sum_cell].value, correct_data["min_salary"]["formula"]) and approx_equal(round(ws_read_only[min_salary_sum_cell].value, 1), round(correct_data["min_salary"]["values"], 1)):
         response_message["functions"]["min_salary"]["status"] = True
         response_message["functions"]["min_salary"]["message"] = "Минимальное значение зарплаты посчитано верно"
     else:
