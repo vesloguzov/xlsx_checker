@@ -8,19 +8,7 @@ function XlsxCheckerXBlock(runtime, element, data) {
    if(xlsx_analyze != {}){
     console.log(xlsx_analyze)
        try{
-        console.log("START");
-            if(lab_scenario == 1){
-                console.log("LAB1");
-                showLab1FullAnalyze(xlsx_analyze);
-            }
-            else if(lab_scenario == 2){
-                console.log("LAB2");
-                showLab2FullAnalyze(xlsx_analyze);
-            }
-            else if(lab_scenario == 3){
-                console.log("LAB3");
-                showLab3FullAnalyze(xlsx_analyze);
-            }
+			showBlockAnalyze(xlsx_analyze);
         }
         catch(err){
             console.log("errors")
@@ -272,27 +260,66 @@ function XlsxCheckerXBlock(runtime, element, data) {
             });
     }
 
-    function successCheck(result) {
-        console.log("result", result);
-        updatePointsAttempts(result)
-        if(lab_scenario == 1){
+    function showLabErrors(errors){
+    	$('.analyze-errors', element).empty();
+    	errors.forEach(function(item, i, arr) {
+            var error = document.createElement("p");
+            error.innerHTML = item;
+            error.className = 'one-criterion criterion-complete-false';
+            $('.analyze-errors', element).append(error);
+		});
+    }
 
-            showLab1FullAnalyze(result["xlsx_analyze"]);
+    function showBlockAnalyze(analyze_object){
+    	$('.full-analyze', element).hide();
+        $('.errors-analyze', element).hide();
+    	
+    	if(lab_scenario == 1){
+        	if(analyze_object["errors"].length == 0){
+            	showLab1FullAnalyze(analyze_object);
+            	$('.full-analyze', element).show();
+        	}
+        	else{
+        		showLabErrors(analyze_object["errors"]);
+        		$('.errors-analyze', element).show();
+        	}
         }
         else if(lab_scenario == 2){
-            showLab2FullAnalyze(result["xlsx_analyze"])
+        	if(analyze_object["errors"].length == 0){
+            	showLab2FullAnalyze(analyze_object);
+            	$('.full-analyze', element).show();
+           	}
+        	else{
+        		showLabErrors(analyze_object["errors"]);
+        		$('.errors-analyze', element).show();
+        	}
         }
         else if(lab_scenario == 3){
-            showLab3FullAnalyze(result["xlsx_analyze"])
-        }
+        	if(analyze_object["errors"].length == 0){
+            	showLab3FullAnalyze(analyze_object);
+            	$('.full-analyze', element).show();
+        	}
+            else{
+        		showLabErrors(analyze_object["errors"]);
+        		$('.errors-analyze', element).show();
+        	}
+		}
+		$('.block-analyze', element).show(300);
+    }
 
-        $('.block-analyze', element).show(300);
-
+    function successCheck(result) {
+        console.log("result", result);
+        updatePointsAttempts(result);
+        analyze_object = result["xlsx_analyze"];
+        showBlockAnalyze(analyze_object);
     }
 
     $(element).find('.Check').bind('click', function() {
         console.log("CHECK");
         $('.block-analyze', element).hide();
+        $('.full-analyze', element).hide();
+        $('.errors-analyze', element).hide();
+
         $.ajax({
             type: "POST",
             url: student_submit,

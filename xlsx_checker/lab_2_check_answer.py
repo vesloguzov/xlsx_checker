@@ -45,10 +45,10 @@ def check_ranges_equal(ws_correct, ws_student, range):
 
 def lab_2_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only):
     response_message["errors"] = []
-    print "OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!22222222222222222"
+    response_message["ws1"] = {}
+    response_message["ws2"] = {}
 
     if (len(student_wb.get_sheet_names()) == 2):
-        print "OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         student_ws_1 = student_wb[student_wb.get_sheet_names()[0]]
         student_ws_2 = student_wb[student_wb.get_sheet_names()[1]]
         correct_ws_1 = correct_wb[correct_wb.get_sheet_names()[0]]
@@ -72,6 +72,5 @@ def lab_2_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_
             response_message["ws2"]["data"]["status"] = False
             response_message["ws2"]["data"]["message"] = "Данные для графика посчитаны неверно"
     else:
-        print "OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!3333333333333333333"
         response_message["errors"].append('Документ должен содержать два рабочих листа')
     return response_message

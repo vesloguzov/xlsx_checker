@@ -77,19 +77,19 @@ class XlsxCheckerXBlock(XBlock):
                   "instruction_name": "Лабораторная 1. Указания к работе.docx", 
                   "template_name": "lab1_template.xlsx",
                   "correct_name": "lab1_correct.xlsx",
-                  "name": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel"
+                  "title": "Формулы, функции и диаграммы в процессоре Microsoft Office Excel"
                  },
             "2": {
                   "instruction_name": "Лабораторная 2. Указания к работе.docx", 
                   "template_name": "lab2_template.xlsx",
                   "correct_name": "lab2_correct.xlsx",
-                  "name": "Построение графиков функций"
+                  "title": "Построение графиков функций"
                  },
             "3": {
                   "instruction_name": "Лабораторная 3. Указания к работе.docx",
                   "template_name": "lab3_template.xlsx",
                   "correct_name": "lab3_correct.xlsx",
-                  "name": "Сортировка, фильтры и промежуточные итоги"
+                  "title": "Сортировка, фильтры и промежуточные итоги"
                  },
         },
         scope=Scope.settings
@@ -337,6 +337,8 @@ class XlsxCheckerXBlock(XBlock):
         self.instruction_link = self.scenarios_settings[str(self.lab_scenario)]["instruction_name"]
         self.template_link = self.scenarios_settings[str(self.lab_scenario)]["template_name"]
         self.correct_link = self.runtime.local_resource_url(self, 'corrects/' + self.scenarios_settings[str(self.lab_scenario)]["correct_name"])
+
+        self.display_name = 'Проверка MS Excel. ' + self.scenarios_settings[str(self.lab_scenario)]["title"]
 
         if str(self.lab_scenario) == "1":
             template_wb = Workbook()
