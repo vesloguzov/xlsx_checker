@@ -292,7 +292,7 @@ class XlsxCheckerXBlock(XBlock):
         if str(self.lab_scenario) == "1":
             student_wb =  load_workbook(default_storage.open(student_path))
             student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
-            result = lab_1_check_answer(student_wb, student_wb_data_only)
+            result = lab_1_check_answer(student_wb, student_wb_data_only, default_storage.open(student_path))
             self.xlsx_analyze = result
 
         if str(self.lab_scenario) == "2":

@@ -7,12 +7,12 @@ function XlsxCheckerXBlock(runtime, element, data) {
 
    if(xlsx_analyze != {}){
     console.log(xlsx_analyze)
-       try{
+       // try{
 			showBlockAnalyze(xlsx_analyze);
-        }
-        catch(err){
-            console.log("errors")
-        }
+        // }
+        // catch(err){
+        //     console.log("errors")
+        // }
    }
    else{
        $('.block-analyze', element).hide();
@@ -134,6 +134,27 @@ function XlsxCheckerXBlock(runtime, element, data) {
                 if (item == "charts"){
                     criterion_header.innerHTML = "Графики";
                     criterion_all.appendChild(criterion_header);
+                    console.log(one_obj)
+                    var bar_obj = one_obj["bar_chart"];
+
+                    if(bar_obj["errors"].length != 0){
+                        bar_obj["errors"].forEach(function(item, i, arr) {
+                            var error = document.createElement("p");
+                            error.innerHTML = "Гистограмма: " + item;
+                            error.className = 'one-criterion criterion-complete-false';
+                            criterion_all.append(error);
+                        });
+                    }
+                    else{
+                        Object.keys(bar_obj).map(function(item, i, arr) {
+                            if(item!="errors"){
+                                var criterion_element_all = document.createElement("p");
+                                criterion_element_all.innerHTML = "Гистограмма: " + bar_obj[item]["message"];
+                                criterion_element_all.className = 'one-criterion criterion-complete-'+bar_obj[item]["status"];
+                                criterion_all.appendChild(criterion_element_all);
+                            }
+                        });
+                    }
 
                 }
                 
