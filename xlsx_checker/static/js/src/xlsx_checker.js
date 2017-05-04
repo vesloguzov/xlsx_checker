@@ -41,7 +41,7 @@ function XlsxCheckerXBlock(runtime, element, data) {
             success: function(result){
                 $('.download_student_file', element).html(result["student_filename"]);
                 $('.current-student-file', element).show();
-                $('input[name="studentFile"]').val("");
+                $('input[name="studentFile"]', element).val("");
             }
 
         });
@@ -53,7 +53,7 @@ function XlsxCheckerXBlock(runtime, element, data) {
             $.ajax({
                 url: upload_student_file,
                 type: 'POST',
-                data: new FormData($('form.student')[0]),
+                data: new FormData($('form.student', element)[0]),
                 cache: false,
                 contentType: false,
                 processData: false,
@@ -374,7 +374,7 @@ function XlsxCheckerXBlock(runtime, element, data) {
         $('.full-analyze', element).hide();
         $('.errors-analyze', element).hide();
 
-        $('input[name="studentFile"]').val("");
+        $('input[name="studentFile"]', element).val("");
 
         $.ajax({
             type: "POST",
