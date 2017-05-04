@@ -48,7 +48,7 @@ function XlsxCheckerXBlock(runtime, element, data) {
     }
 
     $(':button.upload-student-file', element).on('click', function() {
-        var file = $('input[name="studentFile"]').val().trim();
+        var file = $('input[name="studentFile"]', element).val().trim();
         if(file){
             $.ajax({
                 url: upload_student_file,
