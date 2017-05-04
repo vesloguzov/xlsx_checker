@@ -5,24 +5,22 @@ function XlsxCheckerXBlock(runtime, element, data) {
    var lab_scenario = data["lab_scenario"];
    var student_xlsx_name = data["student_xlsx_name"];
 
-   if(xlsx_analyze != {}){
-    console.log(xlsx_analyze)
-       // try{
-			showBlockAnalyze(xlsx_analyze);
-        // }
-        // catch(err){
-        //     console.log("errors")
-        // }
+   if(!jQuery.isEmptyObject(xlsx_analyze)){
+        // console.log("KEK@", jQuery.isEmptyObject(xlsx_analyze));
+		showBlockAnalyze(xlsx_analyze);
    }
    else{
+    console.log("YTEK@", xlsx_analyze);
        $('.block-analyze', element).hide();
    }
    
    if(student_xlsx_name){
-    $('.current-student-file', element).show();
+    console.log("Y");
+        $('.current-student-file', element).show();
    }
    else{
-    $('.current-student-file', element).hide();
+    console.log("N");
+        $('.current-student-file', element).hide();
    }
 
    var upload_student_file = runtime.handlerUrl(element, 'upload_student_file');
@@ -43,6 +41,7 @@ function XlsxCheckerXBlock(runtime, element, data) {
             success: function(result){
                 $('.download_student_file', element).html(result["student_filename"]);
                 $('.current-student-file', element).show();
+                $('input[name="studentFile"]').val("");
             }
 
         });
@@ -134,7 +133,7 @@ function XlsxCheckerXBlock(runtime, element, data) {
                 if (item == "charts"){
                     criterion_header.innerHTML = "Графики";
                     criterion_all.appendChild(criterion_header);
-                    console.log(one_obj)
+
                     var bar_obj = one_obj["bar_chart"];
 
                     if(bar_obj["errors"].length != 0){
@@ -184,12 +183,28 @@ function XlsxCheckerXBlock(runtime, element, data) {
                             criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
                             criterion_all.appendChild(criterion_element_all);
                         }
-                        // if (item == "graphic"){
-                        //     var criterion_element_all = document.createElement("p");
-                        //     criterion_element_all.innerHTML = one_obj[item]["message"];
-                        //     criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
-                        //     criterion_all.appendChild(criterion_element_all);
-                        // }
+                        if (item == "graphic"){
+                            if(one_obj[item]["errors"].length != 0){
+                                one_obj[item]["errors"].forEach(function(subitem, i, arr) {
+                                    var error = document.createElement("p");
+                                    error.innerHTML = subitem;
+                                    error.className = 'one-criterion criterion-complete-false';
+                                    criterion_all.append(error);
+                                });
+                            }
+
+                            else{
+                                Object.keys(one_obj[item]).map(function(subitem, i, arr) {
+                                    if(subitem!="errors"){
+                                        var criterion_element_all = document.createElement("p");
+                                        criterion_element_all.innerHTML = one_obj[item][subitem]["message"];
+                                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item][subitem]["status"];
+                                        criterion_all.appendChild(criterion_element_all);
+                                    }
+                                });
+                            }
+
+                        }
                     });
                 }
 
@@ -203,12 +218,28 @@ function XlsxCheckerXBlock(runtime, element, data) {
                             criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
                             criterion_all.appendChild(criterion_element_all);
                         }
-                        // if (item == "graphic"){
-                        //     var criterion_element_all = document.createElement("p");
-                        //     criterion_element_all.innerHTML = one_obj[item]["message"];
-                        //     criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item]["status"];
-                        //     criterion_all.appendChild(criterion_element_all);
-                        // }
+                        if (item == "graphic"){
+                            if(one_obj[item]["errors"].length != 0){
+                                one_obj[item]["errors"].forEach(function(subitem, i, arr) {
+                                    var error = document.createElement("p");
+                                    error.innerHTML = subitem;
+                                    error.className = 'one-criterion criterion-complete-false';
+                                    criterion_all.append(error);
+                                });
+                            }
+
+                            else{
+                                Object.keys(one_obj[item]).map(function(subitem, i, arr) {
+                                    if(subitem!="errors"){
+                                        var criterion_element_all = document.createElement("p");
+                                        criterion_element_all.innerHTML = one_obj[item][subitem]["message"];
+                                        criterion_element_all.className = 'one-criterion criterion-complete-'+one_obj[item][subitem]["status"];
+                                        criterion_all.appendChild(criterion_element_all);
+                                    }
+                                });
+                            }
+
+                        }
                     });
                 }
                 
@@ -295,6 +326,10 @@ function XlsxCheckerXBlock(runtime, element, data) {
     	$('.full-analyze', element).hide();
         $('.errors-analyze', element).hide();
     	
+
+        console.log(analyze_object);
+
+
     	if(lab_scenario == 1){
         	if(analyze_object["errors"].length == 0){
             	showLab1FullAnalyze(analyze_object);
@@ -329,17 +364,17 @@ function XlsxCheckerXBlock(runtime, element, data) {
     }
 
     function successCheck(result) {
-        console.log("result", result);
         updatePointsAttempts(result);
         analyze_object = result["xlsx_analyze"];
         showBlockAnalyze(analyze_object);
     }
 
     $(element).find('.Check').bind('click', function() {
-        console.log("CHECK");
         $('.block-analyze', element).hide();
         $('.full-analyze', element).hide();
         $('.errors-analyze', element).hide();
+
+        $('input[name="studentFile"]').val("");
 
         $.ajax({
             type: "POST",

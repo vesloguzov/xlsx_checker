@@ -37,13 +37,14 @@ function XlsxCheckerXBlock(runtime, element) {
     document.querySelector("#advanced-settings").removeAttribute("hidden");
   };
 
-  // $( function() {
-  //   $("#lab-tabs", element).tabs();
-  // } );
-
-  $( function() {
-    $( "#lab-tabs" ).accordion();
-  } );
+  $(document).ready(function () {
+      $('.group').hide();
+      $('#'+$('.select-lab').val()).show();
+      $('.select-lab').change(function () {
+          $('.group').hide();
+          $('#'+$(this).val()).show();
+      })
+  });
 
     $(element).find(".save-button").bind("click", function() {
 

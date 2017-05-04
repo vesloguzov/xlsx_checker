@@ -85,8 +85,6 @@ def lab_3_create_template(ws):
                 ws.cell(row=pos_i, column=j).value = shuffle_data[i-1][2]
             if j == 5:
                 ws.cell(row=pos_i, column=j).value = shuffle_data[i-1][3]
-            # if j == 7:
-            #     ws.cell(row=pos_i, column=j).value = shuffle_data[i-1][4]
 
     set_border_and_fill(ws, 'A3:F17')
 

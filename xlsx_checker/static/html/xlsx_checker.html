@@ -1,3 +1,4 @@
+{% load static %}
 <div class="problem">
 	<div class="problem-progress">
         {% if points == 0 or points %}
@@ -14,8 +15,15 @@
 	        <div id="question">{{question|safe}}</div>
 	    {% endif %}
 
-	    <a class="download_instruction" href="{{instruction_link}}">Скачать инструкцию</a><br />
-	    <a class="template_link" href="{{template_link}}">Скачать шаблон для задания</a>
+	    <div style="padding: 10px;">
+	    	<div class="download_block">
+		    	<a class="download_instruction" href="{{instruction_link}}"><img src={{download_instruction_icon}} />Скачать инструкцию</a><br />
+			</div>
+	    	
+	    	<div class="download_block">
+	    		<a class="template_link" href="{{template_link}}"><img src={{download_template_icon}} />Скачать шаблон для задания</a>
+			</div>
+	    </div>
 
 	    <div class="file-upload-block">
 		    

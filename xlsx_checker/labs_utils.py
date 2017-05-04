@@ -12,6 +12,33 @@ from openpyxl.chart.layout import Layout, ManualLayout
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+def check_ranges_equal(ws_correct, ws_student, range):
+    correct_rows = ws_correct[range]
+    correct_list = []
+    for row in correct_rows:
+        for cell in row:
+            try:
+                correct_list.append(round(float(cell.value), 6))
+            except:
+                try:
+                    correct_list.append(cell.value.replace(" ", "").lower().replace(".", ","))
+                except:
+                    return False
+
+    student_rows = ws_student[range]
+    student_list = []
+    for row in student_rows:
+        for cell in row:
+            try:
+                student_list.append(round(float(cell.value), 6))
+            except:
+                try:
+                    student_list.append(cell.value.replace(" ", "").lower().replace(".", ","))
+                except:
+                    return False
+
+    return correct_list == student_list
+
 def range_is_date_format(ws, range):
     rows = ws[range]
     for row in rows:

@@ -38,7 +38,7 @@ def create_table_ws_1(ws):
     ws = set_border_and_fill(ws, 'A3:B3', fill=PatternFill("solid", fgColor="DDDDDD"))
     ws = set_border_and_fill(ws, 'A4:B28', None)
 
-def create_table_ws_2(ws):
+def create_table_ws_2(ws, img):
     ws.column_dimensions["A"].width = 17
     ws.column_dimensions["B"].width = 17
     ws['A1'] = 'График функции '
@@ -49,15 +49,15 @@ def create_table_ws_2(ws):
     ws = set_border_and_fill(ws, 'A3:B3', fill=PatternFill("solid", fgColor="DDDDDD"))
     ws = set_border_and_fill(ws, 'A4:B34', None)
 
-    # img = Image('img/lab_2_equation.png')
-    # ws.add_image(img, 'C1')
+    image = Image(img)
+    ws.add_image(image, 'C1')
     ws.row_dimensions[1].height = 22.5
     ws.row_dimensions[2].height = 22.5
 
-def lab_2_create_template(wb):
+def lab_2_create_template(wb, img):
     ws1 = wb.active
     ws1.title = "Лист 1".decode('utf8')
     ws2 = wb.create_sheet(title="Лист 2".decode('utf8'))
     create_table_ws_1(ws1)
-    create_table_ws_2(ws2)
+    create_table_ws_2(ws2, img)
     return wb

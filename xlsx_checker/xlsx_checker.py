@@ -199,6 +199,8 @@ class XlsxCheckerXBlock(XBlock):
             "template_link": self.runtime.local_resource_url(self, 'public/templates/' + self.template_link),
             "lab_scenario": self.lab_scenario,
             "xlsx_analyze": self.xlsx_analyze,
+            "download_template_icon": self.runtime.local_resource_url(self, 'public/images/download_template_icon.png'),
+            "download_instruction_icon": self.runtime.local_resource_url(self, 'public/images/download_instruction_icon.png'),
         }
 
         if self.max_attempts != 0:
@@ -289,30 +291,39 @@ class XlsxCheckerXBlock(XBlock):
         result = {}
         student_path = self._students_storage_path(self.student_xlsx_uid, self.student_xlsx_name)
         
+        self.xlsx_analyze["errors"] = []
+
         if str(self.lab_scenario) == "1":
-            student_wb =  load_workbook(default_storage.open(student_path))
-            student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
-            result = lab_1_check_answer(student_wb, student_wb_data_only, default_storage.open(student_path))
-            self.xlsx_analyze = result
+            try:
+                student_wb =  load_workbook(default_storage.open(student_path))
+                student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
+                result = lab_1_check_answer(student_wb, student_wb_data_only, default_storage.open(student_path))
+                self.xlsx_analyze = result
+            except:
+                self.xlsx_analyze["errors"].append("Ошибка открытия файла")
 
         if str(self.lab_scenario) == "2":
-
-            correct_wb = load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab2_correct.xlsx')
-            correct_wb_data_only =  load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab2_correct.xlsx', data_only=True)
-
-            student_wb =  load_workbook(default_storage.open(student_path))
-            student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
-            result = lab_2_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only)
-            self.xlsx_analyze = result
+            try:
+                correct_wb = load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab2_correct.xlsx')
+                correct_wb_data_only =  load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab2_correct.xlsx', data_only=True)
+                student_wb =  load_workbook(default_storage.open(student_path))
+                student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
+                result = lab_2_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only, default_storage.open(student_path))
+                self.xlsx_analyze = result
+            except:
+                self.xlsx_analyze["errors"].append("Ошибка открытия файла")
 
         if str(self.lab_scenario) == "3":
-            correct_wb = load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab3_correct.xlsx')
-            correct_wb_data_only =  load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab3_correct.xlsx', data_only=True)
-            # Проверка
-            student_wb =  load_workbook(default_storage.open(student_path))
-            student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
-            result = lab_3_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only)
-            self.xlsx_analyze = result
+            try:
+                correct_wb = load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab3_correct.xlsx')
+                correct_wb_data_only =  load_workbook('/home/edx/edxwork/xlsx_checker/xlsx_checker/corrects/lab3_correct.xlsx', data_only=True)
+                # Проверка
+                student_wb =  load_workbook(default_storage.open(student_path))
+                student_wb_data_only =  load_workbook(default_storage.open(student_path), data_only=True)
+                result = lab_3_check_answer(correct_wb, correct_wb_data_only, student_wb, student_wb_data_only)
+                self.xlsx_analyze = result
+            except:
+                self.xlsx_analyze["errors"].append("Ошибка открытия файла")
 
         grade_global = check_answer()
         self.points = grade_global
@@ -348,28 +359,17 @@ class XlsxCheckerXBlock(XBlock):
             
 
         if str(self.lab_scenario) == "2":
+            
             template_wb = Workbook()
-            template_wb = lab_2_create_template(template_wb)
+
+            # Сделать нормально
+            img = self.runtime.local_resource_url(self, 'public/img/lab_2_equation.png')
+            img = '/home/edx/edxwork/xlsx_checker/xlsx_checker/public/images/lab_2_equation.png'
+
+            template_wb = lab_2_create_template(template_wb, img)
             template_wb.save('/home/edx/edxwork/xlsx_checker/xlsx_checker/public/templates/' + self.template_link)
 
         if str(self.lab_scenario) == "3":
-            data = [
-                    ["Комбайн", "19.07.2017", 100, 7800.00],
-                    ["Миксер", "30.05.2017", 38, 3000.00],
-                    ["Микровоновка", "23.08.2017", 38, 4500.00],
-                    ["Пылесос", "17.03.2017", 25, 3000.00],
-                    ["Холодильник", "03.05.2016", 56, 25000.00],
-                    ["Пылесос", "03.08.2017", 6, 1500.00],
-                    ["Телевизор", "02.03.2014", 50, 6000.00],
-                    ["Телевизор", "16.02.2016", 19, 12000.00],
-                    ["Телевизор", "13.09.2017", 32, 4500.00],
-                    ["Утюг", "12.07.2016", 70, 2000.00],
-                    ["Утюг", "20.08.2016", 15, 1000.00],
-                    ["Утюг", "02.08.2017", 20, 2900.00],
-                    ["Чайник", "15.03.2017", 25, 1540.00],
-                    ["Чайник", "27.07.2016", 102, 1200.00],
-                    ["Чайник", "04.08.2016", 45, 500.00],
-                   ]
             template_wb = Workbook()
             template_ws = template_wb.active
             template_ws = lab_3_create_template(template_ws)

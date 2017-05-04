@@ -7,27 +7,26 @@
   <div id="main-settings">
 
   <h2>В данный момент доступны три лабораторных работы Microsoft Office Excel</h2>
- 
- <div id="lab-tabs">
-    <h3>Формулы, функции и диаграммы</h3>  
-        <div id="lab-tabs-1">
-            <p>Описание лабораторной работы по формулам, функциям, диаграммам ...</p>
-        </div>
-    <h3>Построение графиков функций</h3>
-        <div id="lab-tabs-1">
-            <p>Описание лабораторной работы по построению графиков функции ...</p>
-        </div>
-    <h3>Сортировка, фильтры и промежуточные итоги</h3>
-        <div id="lab-tabs-1">
-            <p>Описание лабораторной работы по сортировке, фильтрам, промежуточным итогам...</p>
-        </div>
-  </div>
+  
+ <div class="main-settings-content">
+    <select class="select-lab" name="lab_scenario" selected="{{lab_scenario}}">
+        <option {% if lab_scenario == 1 %} selected="selected" {% endif %} value="1">Формулы, функции и диаграммы</option>
+        <option {% if lab_scenario == 2 %} selected="selected" {% endif %} value="2">Построение графиков функций</option>
+        <option {% if lab_scenario == 3 %} selected="selected" {% endif %} value="3">Сортировка, фильтры и промежуточные итоги</option>
+       </select>
 
-<select class="select-lab" name="lab_scenario" selected="{{lab_scenario}}">
-    <option {% if lab_scenario == 1 %} selected="selected" {% endif %} value="1">Формулы, функции и диаграммы</option>
-    <option {% if lab_scenario == 2 %} selected="selected" {% endif %} value="2">Построение графиков функций</option>
-    <option {% if lab_scenario == 3 %} selected="selected" {% endif %} value="3">Сортировка, фильтры и промежуточные итоги</option>
-   </select>
+     <div id="1" class="group" >
+       <p>Описание лабораторной работы по формулам, функциям, диаграммам ...</p>
+    </div>
+        
+     <div id="2" class="group" >
+       <p>Описание лабораторной работы по построению графиков функции ...</p>
+    </div>
+
+     <div id="3" class="group" >
+        <p>Описание лабораторной работы по сортировке, фильтрам, промежуточным итогам...</p>
+    </div>
+</div>
 
   </div>
 
