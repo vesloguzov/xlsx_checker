@@ -1,5 +1,6 @@
 build
 dist
+xlsx_checker/public/templates
 *.egg-info
 *.pyc
 .idea
