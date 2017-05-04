@@ -47,7 +47,7 @@ function XlsxCheckerXBlock(runtime, element, data) {
         });
     }
 
-    $(':button.upload-student-file').on('click', function() {
+    $(':button.upload-student-file', element).on('click', function() {
         var file = $('input[name="studentFile"]').val().trim();
         if(file){
             $.ajax({
