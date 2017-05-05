@@ -6,20 +6,16 @@ function XlsxCheckerXBlock(runtime, element, data) {
    var student_xlsx_name = data["student_xlsx_name"];
 
    if(!jQuery.isEmptyObject(xlsx_analyze)){
-        // console.log("KEK@", jQuery.isEmptyObject(xlsx_analyze));
 		showBlockAnalyze(xlsx_analyze);
    }
    else{
-    console.log("YTEK@", xlsx_analyze);
        $('.block-analyze', element).hide();
    }
    
    if(student_xlsx_name){
-    console.log("Y");
         $('.current-student-file', element).show();
    }
    else{
-    console.log("N");
         $('.current-student-file', element).hide();
    }
 
@@ -28,9 +24,6 @@ function XlsxCheckerXBlock(runtime, element, data) {
    var download_student_file = runtime.handlerUrl(element, 'download_student_file');
    $('.download_student_file', element).attr('href', download_student_file);
    var student_filename = runtime.handlerUrl(element, 'student_filename');
-    
-   // var download_instruction = runtime.handlerUrl(element, 'download_instruction');
-   // $('.download_instruction', element).attr('href', download_instruction);
 
    var student_submit = runtime.handlerUrl(element,'student_submit');
 
