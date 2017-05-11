@@ -234,12 +234,21 @@ class XlsxCheckerXBlock(XBlock):
         return fragment
 
     def studio_view(self, context=None):
+
+        scenarios = []
+        for index,key in enumerate(self.scenarios_settings.keys()):
+            element = {}
+            element["title"] = self.scenarios_settings[str(index+1)]["title"]
+            element["number"] = str(index+1)
+            scenarios.append(element)
+
         context = {
             "display_name": self.display_name,
             "weight": self.weight,
             "question": self.question,
             "max_attempts": self.max_attempts,
             "lab_scenario": self.lab_scenario,
+            "scenarios": scenarios,
         }
 
         fragment = Fragment()

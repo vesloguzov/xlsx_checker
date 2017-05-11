@@ -20,13 +20,12 @@ function XlsxCheckerXBlock(runtime, element, data) {
    }
 
    var upload_student_file = runtime.handlerUrl(element, 'upload_student_file');
-
    var download_student_file = runtime.handlerUrl(element, 'download_student_file');
-   $('.download_student_file', element).attr('href', download_student_file);
    var student_filename = runtime.handlerUrl(element, 'student_filename');
-
    var student_submit = runtime.handlerUrl(element,'student_submit');
 
+    $('.download_student_file', element).attr('href', download_student_file);
+    
     function successLoadStudentFile(result) {
         $.ajax({
             url: student_filename,
